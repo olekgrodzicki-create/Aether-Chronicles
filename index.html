@@ -877,14 +877,14 @@
   /* ── Mini-map ── */
   #minimap-wrap {
     position:absolute;
-    /* default landscape: top-right corner below HUD buttons */
-    top:120px; right:8px;
+    /* next to HP panel — top-left, below the stats HUD */
+    top:175px; left:8px;
     pointer-events:all; z-index:10;
     cursor:grab; touch-action:none;
   }
   #minimap-wrap.dragging { cursor:grabbing; opacity:0.85; }
   @media (orientation:portrait){
-    /* portrait: bottom-left, away from skill bar on right */
+    /* portrait: same position */
     #minimap-wrap { top:auto; bottom:160px; right:auto; left:8px; }
   }
   #minimap-canvas {
@@ -1082,9 +1082,6 @@
     <div class="drawer-title-big">AETHER CHRONICLES</div>
     <div class="drawer-sep"></div>
     <div class="menu-nav-list">
-      <div class="nav-item" onclick="openPanel('char');closeMainMenu()"><span class="nav-icon">&#128100;</span><span class="nav-label">CHARACTER</span><span class="nav-arrow">&#8250;</span></div>
-      <div class="nav-item" onclick="openPanel('equip-inv');closeMainMenu()"><span class="nav-icon">&#127890;</span><span class="nav-label">EQUIPMENT &amp; INVENTORY</span><span class="nav-arrow">&#8250;</span></div>
-      <div class="nav-item" onclick="openPanel('skills-panel');closeMainMenu()"><span class="nav-icon">&#9889;</span><span class="nav-label">SKILLS</span><span class="nav-arrow">&#8250;</span></div>
       <div class="nav-item" onclick="openZoneSelect();closeMainMenu()"><span class="nav-icon">&#128506;</span><span class="nav-label">ZONE SELECT</span><span class="nav-arrow">&#8250;</span></div>
     </div>
     <div class="drawer-sep"></div>
@@ -1094,8 +1091,7 @@
     </div>
     <div class="drawer-sep"></div>
     <div class="menu-nav-list">
-      <div class="nav-item" onclick="switchClass()"><span class="nav-icon">&#128100;</span><span class="nav-label">SWITCH CLASS</span><span class="nav-arrow">&#8250;</span></div>
-      <div class="nav-item danger-item" onclick="restartGame()"><span class="nav-icon">&#8634;</span><span class="nav-label">RESTART GAME</span><span class="nav-arrow danger">&#8250;</span></div>
+      <div class="nav-item danger-item" onclick="goToMainMenu()"><span class="nav-icon">&#8962;</span><span class="nav-label">MAIN MENU</span><span class="nav-arrow danger">&#8250;</span></div>
       <div class="nav-item" onclick="openPanel('debug');closeMainMenu()"><span class="nav-icon">🛠️</span><span class="nav-label">DEV / DEBUG</span><span class="nav-arrow">&#8250;</span></div>
     </div>
     <div class="drawer-sep"></div>
@@ -1280,12 +1276,13 @@
 //   sprite.armor — armor color drawn on canvas (hex)
 // ──────────────────────────────────────────────────────
 const CLASSES = {
-  warrior:     { name:'Warrior',     icon:'⚔️',  desc:'Melee tank with high HP and armor.',           color:'#c04040', baseStats:{STR:10,DEX:6, CON:10,INT:3, WIS:4, SPD:6, LCK:2 }, hpBase:120,energyBase:50,  startSkills:['strike','heal','mana_surge_w'],  sprite:{body:'#b07030',armor:'#607080'} },
-  ranger:      { name:'Ranger',      icon:'🏹',  desc:'Agile archer with speed and range.',           color:'#40a060', baseStats:{STR:6, DEX:10,CON:6, INT:5, WIS:7, SPD:9, LCK:5 }, hpBase:80, energyBase:70,  startSkills:['quick_shot','heal','mana_surge_r'],sprite:{body:'#609040',armor:'#405030'} },
-  elementalist:{ name:'Elementalist',icon:'🔮',  desc:'Spellcaster of fire, ice, and lightning.',     color:'#4080c0', baseStats:{STR:3, DEX:6, CON:5, INT:12,WIS:10,SPD:7, LCK:4 }, hpBase:65, energyBase:110, startSkills:['fireball','heal','mana_surge'],   sprite:{body:'#506080',armor:'#304060'} },
-  necromancer: { name:'Necromancer', icon:'💀',  desc:'Commands undead and drains life force.',       color:'#8040c0', baseStats:{STR:4, DEX:5, CON:7, INT:11,WIS:9, SPD:5, LCK:3 }, hpBase:75, energyBase:100, startSkills:['death_bolt','heal','mana_surge'],  sprite:{body:'#403060',armor:'#302050'} },
-  assassin:    { name:'Assassin',    icon:'🗡️', desc:'Fast, deadly striker who strikes from shadow.', color:'#c0a020', baseStats:{STR:7, DEX:12,CON:5, INT:5, WIS:5, SPD:11,LCK:8 }, hpBase:70, energyBase:80,  startSkills:['backstab','heal','mana_surge_a'],  sprite:{body:'#303030',armor:'#202020'} },
-  dervish:     { name:'Dervish',     icon:'🌪️', desc:'Whirling warrior blessed with divine energy.',  color:'#c08020', baseStats:{STR:8, DEX:9, CON:7, INT:5, WIS:8, SPD:10,LCK:4 }, hpBase:90, energyBase:90,  startSkills:['scythe_spin','heal','mana_surge_d'],sprite:{body:'#806020',armor:'#604010'} },
+  // baseStats match design table (STR/DEX/CON/INT/WIS/LCK). SPD kept from original design.
+  warrior:     { name:'Warrior',     icon:'⚔️',  desc:'Melee tank with high HP and armor.',           color:'#c04040', baseStats:{STR:4, DEX:1, CON:4, INT:1, WIS:1, SPD:6, LCK:1 }, hpBase:120,energyBase:50,  startSkills:['strike','heal','mana_surge_w'],  sprite:{body:'#b07030',armor:'#607080'} },
+  assassin:    { name:'Assassin',    icon:'🗡️', desc:'Fast, deadly striker who strikes from shadow.', color:'#c0a020', baseStats:{STR:2, DEX:5, CON:1, INT:1, WIS:1, SPD:11,LCK:2 }, hpBase:70, energyBase:80,  startSkills:['backstab','heal','mana_surge_a'],  sprite:{body:'#303030',armor:'#202020'} },
+  dervish:     { name:'Dervish',     icon:'🌪️', desc:'Whirling warrior blessed with divine energy.',  color:'#c08020', baseStats:{STR:3, DEX:2, CON:2, INT:1, WIS:3, SPD:10,LCK:1 }, hpBase:90, energyBase:90,  startSkills:['scythe_spin','heal','mana_surge_d'],sprite:{body:'#806020',armor:'#604010'} },
+  ranger:      { name:'Ranger',      icon:'🏹',  desc:'Agile archer with speed and range.',           color:'#40a060', baseStats:{STR:1, DEX:5, CON:2, INT:1, WIS:1, SPD:9, LCK:2 }, hpBase:80, energyBase:70,  startSkills:['quick_shot','heal','mana_surge_r'],sprite:{body:'#609040',armor:'#405030'} },
+  elementalist:{ name:'Elementalist',icon:'🔮',  desc:'Spellcaster of fire, ice, and lightning.',     color:'#4080c0', baseStats:{STR:1, DEX:1, CON:1, INT:5, WIS:3, SPD:7, LCK:1 }, hpBase:65, energyBase:110, startSkills:['fireball','heal','mana_surge'],   sprite:{body:'#506080',armor:'#304060'} },
+  necromancer: { name:'Necromancer', icon:'💀',  desc:'Commands undead and drains life force.',       color:'#8040c0', baseStats:{STR:1, DEX:1, CON:2, INT:4, WIS:3, SPD:5, LCK:1 }, hpBase:75, energyBase:100, startSkills:['death_bolt','heal','mana_surge'],  sprite:{body:'#403060',armor:'#302050'} },
 };
 // Class-specific mana regen aliases (same effect, different key so each class has own)
 // These are added to ALL_SKILLS below
@@ -1531,27 +1528,27 @@ function staffElement(name){
 //   aoe        — true = auto-attack hits multiple enemies (scythe)
 // ──────────────────────────────────────────────────────
 const WEAPON_DEFS = {
-  // One-handed (can pair with offhand)
-  sword:          {name:'Sword',          hands:1, autoType:'melee',   autoRange:62,  cooldown:1.0, slashType:'sword',     slashColor:'#c0d0e0', dmgMult:1.0, stat:'STR'},
-  axe:            {name:'Axe',            hands:1, autoType:'melee',   autoRange:66,  cooldown:1.1, slashType:'sword',     slashColor:'#e09040', dmgMult:1.1, stat:'STR'},
-  dagger:         {name:'Dagger',         hands:1, autoType:'melee',   autoRange:45,  cooldown:0.7, slashType:'dagger',    slashColor:'#c8c020', dmgMult:0.7, stat:'DEX', mainHandOnly:true},
-  offhand_dagger: {name:'Offhand Dagger', hands:1, autoType:'none',    autoRange:0,   cooldown:999, slashType:'dagger',    slashColor:'#c8c020', dmgMult:0,   stat:'DEX', offhandOnly:true, noAuto:true},
-  wand:           {name:'Wand',           hands:1, autoType:'bolt',    autoRange:150, cooldown:0.8, slashType:'muzzle',    slashColor:'#a040ff', dmgMult:0.8, stat:'INT'},
-  focus:          {name:'Focus',          hands:1, autoType:'none',    autoRange:0,   cooldown:999, slashType:'muzzle',    slashColor:'#4080ff', dmgMult:0,   stat:'INT', noAuto:true},
+  // One-handed (can pair with offhand). cooldown = attack speed from design table.
+  // perk = hardcoded weapon-type bonus, always active regardless of rarity.
+  sword:          {name:'Sword',          hands:1, autoType:'melee',    autoRange:62,  cooldown:0.85, slashType:'sword',     slashColor:'#c0d0e0', stat:'STR', perk:'sword_bleed'},
+  axe:            {name:'Axe',            hands:1, autoType:'melee',    autoRange:66,  cooldown:0.95, slashType:'sword',     slashColor:'#e09040', stat:'STR', perk:'axe_aoe3'},
+  dagger:         {name:'Dagger',         hands:1, autoType:'melee',    autoRange:45,  cooldown:0.7,  slashType:'dagger',    slashColor:'#c8c020', stat:'DEX', mainHandOnly:true, perk:'dagger_crit_followup'},
+  offhand_dagger: {name:'Offhand Dagger', hands:1, autoType:'none',     autoRange:0,   cooldown:999,  slashType:'dagger',    slashColor:'#c8c020',   stat:'DEX', offhandOnly:true, noAuto:true},
+  wand:           {name:'Wand',           hands:1, autoType:'bolt',     autoRange:150, cooldown:0.8,  slashType:'muzzle',    slashColor:'#a040ff', stat:'INT', perk:'wand_instant10'},
+  focus:          {name:'Focus',          hands:1, autoType:'none',     autoRange:0,   cooldown:999,  slashType:'muzzle',    slashColor:'#4080ff',   stat:'INT', noAuto:true, perk:'focus_energy15'},
   // 1-hand spear: shorter shaft, pairs with offhand
-  spear_1h:       {name:'Shortspear',     hands:1, autoType:'melee',   autoRange:75,  cooldown:1.05,slashType:'sword',     slashColor:'#90c8e8', dmgMult:0.9, stat:'STR'},
-  // Main-hand shield: blocks + bashes
-  shield_mh:      {name:'War Shield',     hands:1, autoType:'melee',   autoRange:52,  cooldown:1.5, slashType:'sword',     slashColor:'#6090c0', dmgMult:0.55,stat:'CON'},
+  spear_1h:       {name:'Shortspear (1H)',hands:1, autoType:'melee',    autoRange:75,  cooldown:1.0,  slashType:'sword',     slashColor:'#90c8e8', stat:'STR', perk:'spear1h_bleed30'},
+  // shield_mh removed per design (main-hand shield removed)
   // Two-handed (offhand locked)
-  staff:          {name:'Staff',          hands:2, autoType:'bolt',    autoRange:220, cooldown:1.2, slashType:'fire_puff', slashColor:'#4080ff', dmgMult:1.3, stat:'INT'},
-  hammer:         {name:'Hammer',         hands:2, autoType:'melee',   autoRange:62,  cooldown:1.4, slashType:'sword',     slashColor:'#e08020', dmgMult:1.5, stat:'STR'},
+  staff:          {name:'Staff',          hands:2, autoType:'bolt',     autoRange:220, cooldown:1.0,  slashType:'fire_puff', slashColor:'#4080ff', stat:'INT', perk:'staff_aoe15'},
+  hammer:         {name:'Hammer',         hands:2, autoType:'melee',    autoRange:62,  cooldown:1.4,  slashType:'sword',     slashColor:'#e08020', stat:'STR', perk:'hammer_stun25'},
   // Old short spear (legacy)
-  spear_old:      {name:'Spear',          hands:2, autoType:'melee',   autoRange:95,  cooldown:1.1, slashType:'sword',     slashColor:'#80c0e0', dmgMult:1.0, stat:'STR', _legacy:true},
+  spear_old:      {name:'Spear',          hands:2, autoType:'melee',    autoRange:95,  cooldown:1.1,  slashType:'sword',     slashColor:'#80c0e0', stat:'STR', _legacy:true},
   // 2-hand pike: very long reach
-  spear:          {name:'Pike',           hands:2, autoType:'melee',   autoRange:120, cooldown:1.2, slashType:'sword',     slashColor:'#80c0e0', dmgMult:1.1, stat:'STR'},
-  scythe:         {name:'Scythe',         hands:2, autoType:'aoe_melee',autoRange:75, cooldown:1.4, slashType:'scythe',    slashColor:'#d0b030', dmgMult:1.1, stat:'STR', aoe:true},
-  shortbow:       {name:'Shortbow',       hands:2, autoType:'arrow',   autoRange:180, cooldown:0.9, slashType:'arrow_puff',slashColor:'#c8a050', dmgMult:0.8, stat:'DEX'},
-  longbow:        {name:'Longbow',        hands:2, autoType:'arrow',   autoRange:300, cooldown:1.3, slashType:'arrow_puff',slashColor:'#c8a050', dmgMult:1.2, stat:'DEX'},
+  spear:          {name:'Pike (2H)',       hands:2, autoType:'melee',    autoRange:120, cooldown:1.2,  slashType:'sword',     slashColor:'#80c0e0', stat:'STR', perk:'spear_5th_extra'},
+  scythe:         {name:'Scythe',         hands:2, autoType:'aoe_melee',autoRange:75,  cooldown:1.4,  slashType:'scythe',    slashColor:'#d0b030', stat:'STR', aoe:true},
+  shortbow:       {name:'Shortbow',       hands:2, autoType:'arrow',    autoRange:180, cooldown:1.1,  slashType:'arrow_puff',slashColor:'#c8a050', stat:'DEX', perk:'shortbow_bleed35'},
+  longbow:        {name:'Longbow',        hands:2, autoType:'arrow',    autoRange:300, cooldown:1.5,  slashType:'arrow_puff',slashColor:'#c8a050', stat:'DEX', perk:'longbow_slow10'},
 };
 
 const OFFHAND_DEFS = {
@@ -1578,10 +1575,11 @@ const WEAPON_NAME_PARTS = {
 };
 
 const WEAPON_POOL_ALL = [
+  // shield_mh removed per design (main-hand shield removed)
   {type:'sword',    weight:18},{type:'axe',     weight:12},{type:'dagger',   weight:14},
   {type:'offhand_dagger',weight:8},
   {type:'wand',     weight:10},{type:'staff',   weight:10},{type:'hammer',   weight:8},
-  {type:'spear',    weight:7}, {type:'spear_1h',weight:8}, {type:'shield_mh',weight:5},
+  {type:'spear',    weight:7}, {type:'spear_1h',weight:8},
   {type:'scythe',   weight:6}, {type:'shortbow',weight:8}, {type:'longbow',  weight:6},
 ];
 
@@ -1803,11 +1801,9 @@ function getChestArmorIconDataUrl(armorClass){
 }
 
 function getWeaponName(type, rarity){
-  const parts=WEAPON_NAME_PARTS[type]||['Iron'];
-  const prefix=parts[rand(0,parts.length-1)];
+  // Rarity is shown via color — no rarity prefix in name
   const def=WEAPON_DEFS[type];
-  const base=def?def.name:'Weapon';
-  return rarity!=='Common'?`${rarity} ${prefix} ${base}`:`${prefix} ${base}`;
+  return def?def.name:(type.charAt(0).toUpperCase()+type.slice(1));
 }
 
 // Returns an <img> tag for weapon/chest canvas icons, or emoji span for others
@@ -2034,27 +2030,32 @@ const ZONES = [
   {id:2,name:'ASHKEEP',     subname:'Dungeon of Ash',        minLv:11,maxLv:15, enemyCount:10, bossChance:0,   color:'#201520',bg:'#0f0f18',groundColor:'#181018',enemies:['dark_knight','death_archer','dread_lancer','cultist_mage','shadow'],boss:'lich',music:'dungeon',isDungeon:true},
   {id:3,name:'AETHERHAVEN', subname:'The Wandering Town',    minLv:1, maxLv:99, enemyCount:0,  bossChance:0,   color:'#302040',bg:'#0c0a14',enemies:[],isShop:true,
    storageChest:{x:840, y:580},
-   shrine:{x:1200, y:1060, hpRegen:20, enRegen:20, radius:70},
+   shrine:{x:1200, y:900, hpRegen:0.20, enRegen:0.20, radius:70, isPct:true},
    shopNPC:{x:1200,y:1280,name:'Mira',title:'General Store',icon:'🧝‍♀️', mode:'general'},
    shopNPCs:[
      // ── ROW: MELEE WEAPONS  (y=820, spread left of shrine) ──────────
-     {x:840,  y:820,  name:'Aldric',  title:'Swords & Axes',    icon:'⚔️',  mode:'blades'},
-     {x:960,  y:820,  name:'Brak',    title:'Daggers',          icon:'🗡️',  mode:'daggers'},
-     {x:1080, y:820,  name:'Veskar',  title:'Scythes',          icon:'☠️',  mode:'scythes'},
+     {x:720,  y:820,  name:'Aldric',  title:'Swords',           icon:'⚔️',  mode:'swords'},
+     {x:840,  y:820,  name:'Margal',  title:'Axes',             icon:'🪓',  mode:'axes'},
+     {x:960,  y:820,  name:'Durn',    title:'Hammers',          icon:'🔨',  mode:'hammers'},
+     {x:1080, y:820,  name:'Brak',    title:'Daggers',          icon:'🗡️',  mode:'daggers'},
+     {x:1200, y:820,  name:'Veskar',  title:'Scythes',          icon:'☠️',  mode:'scythes'},
      // ── ROW: POLEARMS + RANGED  (y=820, right of shrine) ───────────
-     {x:1320, y:820,  name:'Torla',   title:'Spears & Pikes',   icon:'🏹',  mode:'polearms'},
+     {x:1320, y:820,  name:'Torla',   title:'Spears & Pikes',   icon:'🪃',  mode:'polearms'},
      {x:1440, y:820,  name:'Fenwick', title:'Bows',             icon:'🎯',  mode:'bows'},
      {x:1560, y:820,  name:'Zivra',   title:'Wands & Staves',   icon:'🔮',  mode:'staves'},
      // ── ROW: DEFENSE & OFFHAND  (y=1060, left of shrine) ───────────
-     {x:840,  y:1060, name:'Durrak',  title:'War Shields (MH)', icon:'🛡️',  mode:'shields_mh'},
-     {x:960,  y:1060, name:'Gorra',   title:'Offhand Shields',  icon:'🔰',  mode:'shields_oh'},
-     {x:1080, y:1060, name:'Serath',  title:'Other Offhand',    icon:'🔯',  mode:'offhand'},
+     // shields_mh removed — Durrak replaced by offhand shields only
+     {x:840,  y:1060, name:'Gorra',   title:'Offhand Shields',  icon:'🔰',  mode:'shields_oh'},
+     {x:960,  y:1060, name:'Serath',  title:'Other Offhand',    icon:'🔯',  mode:'offhand'},
      // ── ROW: ARMOR  (y=1060, right of shrine) ───────────────────────
-     {x:1320, y:1060, name:'Borvak',  title:'Plate & Mail',     icon:'⛏️',  mode:'heavy_armor'},
-     {x:1440, y:1060, name:'Sennah',  title:'Leather & Hide',   icon:'🧥',  mode:'light_armor'},
+     {x:1200, y:1060, name:'Borvak',  title:'Plate & Mail',     icon:'⛏️',  mode:'heavy_armor'},
+     {x:1320, y:1060, name:'Sennah',  title:'Legendary Armour', icon:'🧥',  mode:'legendary_armor'},
      // ── ROW: ACCESSORIES + GENERAL  (south) ─────────────────────────
-     {x:1080, y:1280, name:'Orela',   title:'Rings & Amulets',  icon:'💍',  mode:'accessories'},
-     {x:1200, y:1280, name:'Mira',    title:'General Store',    icon:'🧝‍♀️', mode:'general'},
+     {x:960,  y:1280, name:'Orela',   title:'Rings & Amulets',  icon:'💍',  mode:'accessories'},
+     {x:1080, y:1280, name:'Mira',    title:'General Store',    icon:'🧝‍♀️', mode:'general'},
+     // ── LEGENDARY VENDORS (far south, post-lv20) ───────────────────
+     {x:1200, y:1280, name:'Valdris', title:'Legendary Goods',  icon:'👑',  mode:'legendary'},
+     {x:1320, y:1280, name:'Tharyn',  title:'Legendary Weapons',icon:'⚔️',  mode:'legendary_weapons'},
    ],
   },
   // Zone index 4: accessed via portals added to town (Iron Wastes — lv 16-20)
@@ -2117,7 +2118,7 @@ function rollRarity(luckBonus){
 
 function genItem(slotType, level, luckBonus){
   const rarity=rollRarity(luckBonus||0);
-  const mult=RARITY_MULT[rarity];
+  const mult=1; // rarity affects roll position (rarityBias), not a multiplier
   const scaledLv=Math.max(1,level);
   let item={id:Math.random().toString(36).slice(2),rarity,level:scaledLv};
   
@@ -2131,30 +2132,86 @@ function genItem(slotType, level, luckBonus){
     item.slot='weapon';
     item.weaponType=wtype;
     item.name=getWeaponName(wtype, rarity);
-    item.icon='⚔️'; // fallback emoji
-    item._iconType='weapon'; // flag to render canvas icon
-    item.stats={dmg:Math.round((5+scaledLv*2)*mult*def.dmgMult)};
-    if(Math.random()<0.5) item.stats[def.stat]=Math.round((1+scaledLv*0.3)*mult);
-    if(Math.random()<0.3){
-      const s=['STR','DEX','INT','WIS','SPD'][rand(0,4)];
-      item.stats[s]=(item.stats[s]||0)+Math.round((0.5+scaledLv*0.2)*mult);
+    item.icon='⚔️';
+    item._iconType='weapon';
+
+    // ── Damage roll by level bracket (design table) ──────────────
+    // Rarity biases toward the high end of the range.
+    // rarityBias: 0=pure random, 1=always max
+    const rarityBias={Common:0, Uncommon:0.25, Rare:0.5, Epic:0.75, Legendary:1.0}[rarity];
+    const dmgRanges = {
+      // [lvl1-5_min, lvl1-5_max, lvl6-10_min, lvl6-10_max, lvl11-15_min, lvl11-15_max, lvl16-20_min, lvl16-20_max]
+      sword:     [2,5,  6,12,  10,18, 18,24],
+      axe:       [2,7,  7,14,  14,22, 20,30],
+      hammer:    [3,9,  12,26, 18,35, 24,42],
+      scythe:    [4,7,  7,19,  15,23, 23,29],
+      spear:     [6,8,  14,18, 24,28, 30,34],
+      spear_1h:  [1,4,  10,15, 15,19, 20,23],
+      dagger:    [2,4,  9,11,  13,15, 16,18],
+      offhand_dagger:[1,3, 3,5, 5,7,  6,8],
+      staff:     [1,5,  6,11,  12,16, 16,20],
+      wand:      [1,4,  5,9,   9,12,  13,15],
+      focus:     [0,0,  0,0,   0,0,   0,0],   // no dmg
+      shortbow:  [2,6,  10,13, 15,19, 22,24],
+      longbow:   [1,7,  4,15,  15,24, 24,28],
+    };
+    const br = scaledLv<=5?0 : scaledLv<=10?2 : scaledLv<=15?4 : 6;
+    const ranges = dmgRanges[wtype]||dmgRanges.sword;
+    const dMin=ranges[br], dMax=ranges[br+1];
+    const roll = dMin + Math.round((dMax-dMin)*(Math.random()*(1-rarityBias)+rarityBias*0.6));
+    item.stats = {dmg: Math.max(dMin, Math.min(dMax, roll))};
+
+    // Staff & wand & focus also give energy/regen (design table)
+    if(wtype==='staff'||wtype==='wand'||wtype==='focus'){
+      const energyRanges={
+        staff:  [5,10, 7,15, 15,25, 25,35],
+        wand:   [3,7,  6,10, 8,13,  12,16],
+        focus:  [5,10, 8,12, 10,14, 12,16],
+      };
+      const regenRanges={
+        staff:  [0.1,0.1, 0.1,0.1, 0.3,0.3, 0.5,0.5],
+        wand:   [0.1,0.1, 0.2,0.2, 0.3,0.3, 0.4,0.4],
+        focus:  [0.1,0.1, 0.2,0.2, 0.3,0.3, 0.4,0.4],
+      };
+      const eR=energyRanges[wtype]; const rR=regenRanges[wtype];
+      const eMin=eR[br],eMax=eR[br+1];
+      item.stats.energy=eMin+Math.round((eMax-eMin)*(Math.random()*(1-rarityBias)+rarityBias*0.6));
+      item.stats.energyRegen=parseFloat((rR[br]+((rR[br+1]-rR[br])*rarityBias)).toFixed(2));
     }
-    if(Math.random()<0.2) item.stats.hpRegen=parseFloat(((0.1+scaledLv*0.05)*mult).toFixed(2));
-    if(Math.random()<0.2) item.stats.energyRegen=parseFloat(((0.1+scaledLv*0.04)*mult).toFixed(2));
+
+    // ── Rarity attribute bonuses (same pattern for all weapon types) ──
+    // Common: no extras | Uncommon: +1 rand att | Rare: +1+1 | Epic: +2+1 | Legendary: +3+2
+    const allAttrs=['STR','DEX','CON','INT','WIS','LCK'];
+    const rarityAttBonus={Common:[], Uncommon:[[1]], Rare:[[1],[1]], Epic:[[2],[1]], Legendary:[[3],[2]]}[rarity];
+    rarityAttBonus.forEach(([amt])=>{
+      const a=allAttrs[rand(0,allAttrs.length-1)];
+      item.stats[a]=(item.stats[a]||0)+amt;
+    });
+
+    // Offhand dagger: atkSpeedBonus scales with rarity (faster = lower cooldown subtracted)
+    if(wtype==='offhand_dagger'){
+      const _atkBonus=parseFloat(Math.min(0.2,0.05+(scaledLv*0.005)+(rarityBias*0.08)).toFixed(2));
+      item.stats.atkSpeedBonus=_atkBonus;
+    }
   } else if(slotType==='offhand'){
     const isShield=Math.random()<0.5;
     const isFocus=!isShield&&Math.random()<0.5;
     item.slot='offhand';
     if(isShield){
       item.offhandType='shield';
-      item.name=`${rarity!=='Common'?rarity+' ':''}Shield`;
+      item.name='Shield';
       item.icon='🛡️';
-      item.stats={armor:Math.round((4+scaledLv*2)*mult), blockChance:parseFloat((0.1+scaledLv*0.01).toFixed(2))};
+      // Shield armor by level bracket (design table: lv1-5=1, lv6-10=1, lv11-15=2, lv16-20=3)
+      const shieldArmorByBr=[1,1,2,3];
+      const shBr = scaledLv<=5?0 : scaledLv<=10?1 : scaledLv<=15?2 : 3;
+      const rarityBiasS={Common:0,Uncommon:0.25,Rare:0.5,Epic:0.75,Legendary:1.0}[rarity];
+      const shArmor=shieldArmorByBr[shBr];
+      item.stats={armor:shArmor, blockChance:parseFloat((0.1+shBr*0.05+rarityBiasS*0.1).toFixed(2))};
       if(Math.random()<0.4) item.stats.CON=Math.round((1+scaledLv*0.3)*mult);
       if(Math.random()<0.3) item.stats.hp=Math.round((5+scaledLv*2)*mult);
     } else if(isFocus){
       item.offhandType='focus';
-      item.name=`${rarity!=='Common'?rarity+' ':''}Focus`;
+      item.name='Focus';
       item.icon='🔮';
       item.stats={INT:Math.round((2+scaledLv*0.5)*mult)};
       if(Math.random()<0.5) item.stats.WIS=Math.round((1+scaledLv*0.3)*mult);
@@ -2174,33 +2231,68 @@ function genItem(slotType, level, luckBonus){
   } else if(isArmor){
     const at=ARMOR_TYPES[slotType];
     item.slot=slotType;
-    item.name=`${rarity!='Common'?rarity+' ':''}${at}`;
+    item.name=at;
     if(slotType==='chest'){
-      item.icon='🛡'; // fallback
-      item._iconType='chest'; // use canvas chest icon
+      item.icon='🛡'; item._iconType='chest';
       item._armorClass=G.player?CLASS_ARMOR_TYPE[G.player.cls]||'medium':'medium';
     } else {
       item.icon={legs:'🩲',helm:'⛑',gloves:'🧤',boots:'👟'}[slotType];
     }
-    item.stats={armor:Math.round((2+scaledLv*1.5)*mult)};
+    // Armor by level bracket (design table). Rarity biases toward high roll.
+    const rarityBias={Common:0,Uncommon:0.25,Rare:0.5,Epic:0.75,Legendary:1.0}[rarity];
+    const armorRanges={
+      // [lv1-5_min,max, lv6-10_min,max, lv11-15_min,max, lv16-20_fixed]
+      helm:   [0,1, 1,2, 1,2, 2,2],
+      chest:  [1,2, 2,3, 3,5, 5,5],
+      legs:   [0,1, 1,2, 2,3, 4,4],
+      gloves: [0,0, 0,1, 1,1, 1,1],
+      boots:  [0,1, 1,2, 1,2, 2,2], // same as helm
+    };
+    const br = scaledLv<=5?0 : scaledLv<=10?2 : scaledLv<=15?4 : 6;
+    const ar=armorRanges[slotType]||armorRanges.helm;
+    const aMin=ar[br],aMax=ar[br+1];
+    const armorRoll=aMin===aMax?aMin:aMin+Math.round((aMax-aMin)*(Math.random()*(1-rarityBias)+rarityBias*0.6));
+    item.stats={armor:Math.max(aMin,Math.min(aMax,armorRoll))};
     if(Math.random()<0.5) item.stats.hp=Math.round((5+scaledLv*3)*mult);
     if(Math.random()<0.3){const s=['STR','DEX','CON','INT','WIS','SPD'][rand(0,5)];item.stats[s]=Math.round((1+scaledLv*0.3)*mult);}
-    // Armor pieces have good hpRegen chance
     if(Math.random()<0.3) item.stats.hpRegen=parseFloat(((0.2+scaledLv*0.08)*mult).toFixed(2));
     if(Math.random()<0.2) item.stats.energyRegen=parseFloat(((0.1+scaledLv*0.05)*mult).toFixed(2));
   } else {
-    item.slot=slotType;
-    item.name=`${rarity!='Common'?rarity+' ':''}${ACCESSORY_TYPES[slotType]||'Accessory'}`;
+    // Rings, Amulet — att bonuses by level bracket (design table)
+    item.slot=slotType==='ring1'||slotType==='ring2'?'ring':slotType;
+    item.name=ACCESSORY_TYPES[slotType]||'Accessory';
     item.icon=slotType==='amulet'?'📿':'💍';
-    const statKeys=['STR','DEX','CON','INT','WIS','SPD'];
+    const rarityBias={Common:0,Uncommon:0.25,Rare:0.5,Epic:0.75,Legendary:1.0}[rarity];
+    const allAttrs=['STR','DEX','CON','INT','WIS','LCK'];
     item.stats={};
-    const s1=statKeys[rand(0,5)];const s2=statKeys[rand(0,5)];
-    item.stats[s1]=(item.stats[s1]||0)+Math.round((1+scaledLv*0.4)*mult);
-    if(s2!==s1)item.stats[s2]=(item.stats[s2]||0)+Math.round((0.5+scaledLv*0.3)*mult);
-    if(Math.random()<0.4)item.stats.hp=Math.round((8+scaledLv*4)*mult);
-    // Accessories frequently have regen stats
-    if(Math.random()<0.4) item.stats.hpRegen=parseFloat(((0.2+scaledLv*0.1)*mult).toFixed(2));
-    if(Math.random()<0.4) item.stats.energyRegen=parseFloat(((0.15+scaledLv*0.08)*mult).toFixed(2));
+    // Att per level bracket: rings lv1-5=+1, lv6-10=+1-2, lv11-15=+2-3, lv16-20=+3+hp/ene regen
+    // Amulet: lv1-5=+1-2, lv6-10=+2-3, lv11-15=+3+0.5regen, lv16-20=+4+1.0regen+15%block or +0.2critdmg
+    const isAmulet=slotType==='amulet';
+    const br = scaledLv<=5?0 : scaledLv<=10?1 : scaledLv<=15?2 : 3;
+    const ringAttTable=[[1,1],[1,2],[2,3],[3,3]]; // [min,max] att per bracket
+    const amuAttTable= [[1,2],[2,3],[3,3],[4,4]];
+    const table=isAmulet?amuAttTable:ringAttTable;
+    const [amin,amax]=table[br];
+    const attAmt=amin+Math.round((amax-amin)*(Math.random()*(1-rarityBias)+rarityBias*0.6));
+    // Give 1 or 2 random attribute bonuses
+    const a1=allAttrs[rand(0,allAttrs.length-1)];
+    item.stats[a1]=(item.stats[a1]||0)+attAmt;
+    if(Math.random()<0.5){
+      const a2=allAttrs[rand(0,allAttrs.length-1)];
+      if(a2!==a1) item.stats[a2]=(item.stats[a2]||0)+Math.max(1,Math.floor(attAmt*0.5));
+    }
+    // lv16-20: rings/amulet get hp & energy regen
+    if(br===3){
+      item.stats.hpRegen=parseFloat((isAmulet?1.0:0.3+(Math.random()<0.5?0.2:0)).toFixed(2));
+      item.stats.energyRegen=parseFloat((isAmulet?1.0:0.3+(Math.random()<0.5?0.2:0)).toFixed(2));
+    } else if(br===2&&isAmulet){
+      item.stats.hpRegen=0.5; item.stats.energyRegen=0.5;
+    }
+    // Amulet lv16-20 bonus: either +15% block chance OR +0.2 crit dmg (not both)
+    if(isAmulet&&br===3){
+      if(Math.random()<0.5) item.stats.blockChance=0.15;
+      else item.stats.critDmgBonus=0.2;
+    }
   }
   return item;
 }
@@ -2260,7 +2352,7 @@ function getMaxEnergy(){
   if(!G.player) return 50;
   const cls=CLASSES[G.player.cls];
   return cls.energyBase          // base energy from class definition
-    + getAttr('WIS')*3;          // ← each WIS point = 3 energy (change this)
+    + getAttr('WIS')*4;          // ← WIS: +4 energy per point (design table)
 }
 
 // getAttackDmg() — physical auto-attack damage
@@ -2273,8 +2365,8 @@ function getAttackDmg(){
     return Math.max(1, Math.round(1 + getAttr('STR')*0.1)); // bare fists formula
   }
   let base=5
-    + getAttr('STR')*1.5   // ← STR contribution to damage (change 1.5)
-    + getAttr('DEX')*0.5;  // ← DEX contribution to damage (change 0.5)
+    + getAttr('STR')*2.0   // ← STR: +2 melee dmg per point (design table)
+    + getAttr('DEX')*1.0;  // ← DEX: +1 range dmg per point (design table)
   if(wpn&&wpn.stats) base+=(wpn.stats.dmg||0);       // weapon's own damage stat
   const oh=G.player.equipment&&G.player.equipment.offhand;
   if(oh&&oh.weaponType==='offhand_dagger'&&oh.stats) base+=(oh.stats.dmg||0);
@@ -2285,7 +2377,7 @@ function getAttackDmg(){
 // Armor is flat damage subtraction: 10 armor = enemy hits deal 10 less damage
 function getArmor(){
   if(!G.player) return 0;
-  let armor=0;
+  let armor = (G.player.classBonusArmor||0); // class starting bonus
   Object.values(G.player.equipment).forEach(item=>{if(item&&item.stats&&item.stats.armor)armor+=item.stats.armor;});
   return armor;
 }
@@ -2304,10 +2396,13 @@ function getTotalItemStat(stat){
 function calcSkillDmg(skill){
   if(!G.player||!skill.dmgBase) return 0;
   const attr=getAttr(skill.attr||'STR');
-  return Math.round(
+  let dmg = Math.round(
     (skill.dmgBase + attr*(skill.scale||1)) // base + scaled stat
     + (G.player.level-1)*2                  // ← bonus damage per level (change 2)
   );
+  // INT: +5% spell dmg per point for INT-based skills (design table)
+  if(skill.attr==='INT') dmg = Math.round(dmg * (1 + getAttr('INT')*0.05));
+  return dmg;
 }
 
 // mitigateDmg(raw, armor) — applies armor to incoming damage
@@ -2337,7 +2432,9 @@ function initClassSelect(){
   Object.entries(CLASSES).forEach(([key,cls])=>{
     const card=document.createElement('div');
     card.className='class-card';
-    card.innerHTML=`<div class="class-icon">${cls.icon}</div><div class="class-name">${cls.name}</div><div class="class-desc">${cls.desc}</div>
+    card.style.borderColor=cls.color+'80'; // class color at 50% opacity as border accent
+    card.style.boxShadow=`0 0 8px ${cls.color}30`;
+    card.innerHTML=`<div class="class-icon">${cls.icon}</div><div class="class-name" style="color:${cls.color}">${cls.name}</div><div class="class-desc">${cls.desc}</div>
       <div class="class-stats">STR:<span>${cls.baseStats.STR}</span> DEX:<span>${cls.baseStats.DEX}</span> INT:<span>${cls.baseStats.INT}</span></div>`;
     card.onclick=()=>{
       document.querySelectorAll('.class-card').forEach(c=>c.classList.remove('selected'));
@@ -2403,8 +2500,21 @@ function startGame(){
   
   G.player.hp=getMaxHP();
   G.player.energy=getMaxEnergy();
+
+  // ── Class-specific starting bonuses (design table) ──────────────
+  // Stored on player so they persist and are accessible in formulas
+  const cb = G.selectedClass;
+  G.player.classBonusArmor   = cb==='warrior'?3 : cb==='assassin'?1 : cb==='dervish'?1 : 0;
+  G.player.classBonusCritMult= cb==='assassin'?0.2 : 0;          // Assassin: crit x1.4→x1.6
+  G.player.classDervishHeal  = cb==='dervish';                    // every 10th hit heals instead of damages
+  G.player.classRangerRange  = cb==='ranger'?10 : 0;              // +10 attack range with all weapons
+  G.player.classBonusEnRegen = cb==='elementalist'?2 : cb==='necromancer'?1 : 0; // +energy regen/s
+  G.player.classImmuneBleed  = cb==='necromancer';                // immune to bleeding
+  G.player.dervishHitCount   = 0;  // track hits for dervish bonus
+  G.player.axeHitCount       = 0;  // track hits for axe AoE-every-3rd perk
+  G.player.spearHitCount     = 0;  // track hits for spear extra-attack-every-5th perk
   
-  G.zone=0;             // start in Ashfields (zone 0)
+  G.zone=3;             // start in town (Aetherhaven)
   G.enemies=[];
   G.corpses=[];
   G.targetedEnemy=null;
@@ -2434,6 +2544,7 @@ function startGame(){
     {x:400, y:2000, toZone:3,label:'To Town',color:'#a040ff',pulseT:2},
   ];
   G.shopInventory=generateShopInventory(1);
+  G.rerollData={}; // tracks per-vendor reroll cost (doubles, resets after 3min)
   G.shopOpen=false;
   
   // Clear all screens and overlays before starting
@@ -2659,8 +2770,8 @@ function updatePlayer(dt){
   // rawSpeed = base speed + SPD stat bonus
   // Change 1.5 to make the player faster (e.g. 2.0) or slower (e.g. 1.0)
   // Each SPD attribute point adds 0.22 to speed — change 0.22 to adjust SPD scaling
-  const rawSpeed=1.5+getAttr('SPD')*0.22;
-  const maxSpeed=1.5*1.55; // hard cap — even with huge SPD, can't exceed this
+  const rawSpeed=2.0+getAttr('SPD')*0.22;
+  const maxSpeed=2.0*1.55; // hard cap — even with huge SPD, can't exceed this
   const speed=Math.min(rawSpeed,maxSpeed);
   
   let mx=0,my=0;
@@ -2689,7 +2800,7 @@ function updatePlayer(dt){
     const nearest=getNearestEnemy();
     const ws=getWeaponAutoStats(p.equipment&&p.equipment.weapon);
     if(ws.autoType!=='none' && ws.autoRange>0){
-      const autoRange=ws.autoRange;
+      const autoRange=ws.autoRange + (p.classRangerRange||0); // Ranger: +10 range (design table)
       if(nearest && dist(p,nearest)<=autoRange){
         const _ohBonus=(p.equipment&&p.equipment.offhand&&p.equipment.offhand.stats&&p.equipment.offhand.stats.atkSpeedBonus)||0;
         const _effCd=Math.max(0.3, ws.cooldown-_ohBonus);
@@ -2730,23 +2841,86 @@ function getNearestEnemy(){
   return best;
 }
 
+// ── WEAPON PERKS ─────────────────────────────────────────────────
+// Hardcoded per weapon type, always active regardless of rarity.
+// Called after a hit lands on an enemy.
+function applyWeaponPerk(perk, enemy, dmg, isCrit){
+  if(!perk||!enemy||enemy.hp<=0) return;
+  const p=G.player;
+  switch(perk){
+    case 'sword_bleed':    // 30% chance to inflict bleed for 7s (7 ticks)
+      if(Math.random()<0.3){enemy.dotDmg=Math.max(1,Math.round(dmg*0.15));enemy.dotTicks=7;enemy.dotTimer=1.0;spawnFloatNum(enemy.x,enemy.y,'🩸','#ff4444',false);}
+      break;
+    case 'axe_aoe3':       // every 3rd autoattack is AoE — tracked via p.axeHitCount
+      p.axeHitCount=(p.axeHitCount||0)+1;
+      if(p.axeHitCount%3===0){
+        G.enemies.forEach(e=>{if(e!==enemy&&e.hp>0&&dist(p,e)<=80)dealDamage(e,Math.round(dmg*0.7),false,'#e09040');});
+        spawnFloatNum(enemy.x,enemy.y,'AoE!','#e09040',false);
+      }
+      break;
+    case 'hammer_stun25':  // 25% chance to stun for 2s
+      if(Math.random()<0.25){enemy.stunTimer=2;spawnFloatNum(enemy.x,enemy.y,'STUN','#ffcc44',false);}
+      break;
+    case 'spear_5th_extra':// every 5th attack = immediate extra attack (no perk recursion)
+      p.spearHitCount=(p.spearHitCount||0)+1;
+      if(p.spearHitCount%5===0&&enemy.hp>0){const xDmg=Math.round(dmg*0.8);dealDamage(enemy,xDmg,false,'#90c8e8');spawnFloatNum(enemy.x,enemy.y,'EXTRA!','#90c8e8',false);}
+      break;
+    case 'spear1h_bleed30':// 30% bleed for 5s (5 ticks)
+      if(Math.random()<0.3){enemy.dotDmg=Math.max(1,Math.round(dmg*0.12));enemy.dotTicks=5;enemy.dotTimer=1.0;spawnFloatNum(enemy.x,enemy.y,'🩸','#ff4444',false);}
+      break;
+    case 'dagger_crit_followup': // if crit, immediate normal attack that can't crit
+      if(isCrit&&enemy.hp>0){const fDmg=Math.max(1,Math.round(getAttackDmg()*0.9)-( enemy.def||0));dealDamage(enemy,fDmg,false,'#c8c020');spawnFloatNum(enemy.x,enemy.y,'FOLLOW','#c8c020',false);}
+      break;
+    case 'staff_aoe15':    // 15% chance small AoE explosion on hit
+      if(Math.random()<0.15){G.enemies.forEach(e=>{if(e.hp>0&&dist(enemy,e)<=70)dealDamage(e,Math.round(dmg*0.5),false,'#4080ff');});spawnParticles(enemy.x,enemy.y,'#4080ff',6);}
+      break;
+    case 'wand_instant10': // 10% chance to immediately attack again
+      if(Math.random()<0.1&&enemy.hp>0){const xDmg=Math.max(1,Math.round(getAttackDmg()*0.9)-(enemy.def||0));dealDamage(enemy,xDmg,false,'#a040ff');}
+      break;
+    case 'focus_energy15': // 15% chance to gain 5 energy on autoattack
+      if(Math.random()<0.15){p.energy=Math.min(getMaxEnergy(),p.energy+5);spawnFloatNum(p.x,p.y,'+5⚡','#4080ff',false);}
+      break;
+    case 'longbow_slow10': // 10% chance to slow enemy 40% for 2s
+      if(Math.random()<0.1){enemy.slowTimer=2;spawnFloatNum(enemy.x,enemy.y,'SLOW','#8040c0',false);}
+      break;
+    case 'shortbow_bleed35':// 35% bleed for 6s (6 ticks)
+      if(Math.random()<0.35){enemy.dotDmg=Math.max(1,Math.round(dmg*0.1));enemy.dotTicks=6;enemy.dotTimer=1.0;spawnFloatNum(enemy.x,enemy.y,'🩸','#ff4444',false);}
+      break;
+  }
+}
+
 function doAttack(enemy, source, skill){
   const p=G.player;
+  // Dervish: every 10th hit received instead heals (design table)
+  if(p.classDervishHeal){
+    p.dervishHitCount=(p.dervishHitCount||0)+1;
+    if(p.dervishHitCount%10===0){
+      const healAmt=Math.round(getAttackDmg()*0.8);
+      p.hp=Math.min(getMaxHP(), p.hp+healAmt);
+      spawnFloatNum(p.x,p.y,`+${healAmt}💚`,'#40ff80',false);
+      return;
+    }
+  }
   let dmg=getAttackDmg();
   const isCrit=Math.random()<(0.05+getAttr('DEX')*0.01);
-  if(isCrit) dmg=Math.round(dmg*1.8);
-  // Execute modifier: triple damage if enemy below 20% HP
+  if(isCrit) dmg=Math.round(dmg*(1.4+(G.player?.classBonusCritMult||0)+getAttr('LCK')*0.05+getTotalItemStat('critDmgBonus')));
   if(skill&&skill.execute&&enemy.hp/enemy.hpMax<0.2) dmg=Math.round(dmg*3);
   const armor=enemy.def||0;
   dmg=Math.max(1,dmg-armor);
   dealDamage(enemy,dmg,isCrit,skill&&skill.execute&&enemy.hp/enemy.hpMax<0.2?'#ffcc00':'#ff6060');
+  // Apply weapon perk after hit
+  if(!skill){
+    const wpn=p.equipment&&p.equipment.weapon;
+    const def=wpn&&WEAPON_DEFS[wpn.weaponType];
+    if(def&&def.perk) applyWeaponPerk(def.perk,enemy,dmg,isCrit);
+  }
 }
 
 function fireAutoProjectile(target, type, weaponStats){
   const p=G.player;
   let dmg=getAttackDmg();
   const isCrit=Math.random()<(0.05+getAttr('DEX')*0.01);
-  if(isCrit) dmg=Math.round(dmg*1.8);
+  if(isCrit) dmg=Math.round(dmg*(1.4+(G.player?.classBonusCritMult||0)+getAttr('LCK')*0.05+getTotalItemStat('critDmgBonus'))); // x1.4 base + class + LCK + amulet
   const angle=Math.atan2(target.y-p.y,target.x-p.x);
   const isArrow=type==='arrow';
   const isBolt=type==='bolt';
@@ -3018,8 +3192,8 @@ function updatePortals(dt){
       const shrine=zone.shrine;
       if(dist(p,shrine)<shrine.radius){
         const maxHP=getMaxHP(), maxEN=getMaxEnergy();
-        if(p.hp<maxHP) p.hp=Math.min(maxHP, p.hp+shrine.hpRegen*dt);
-        if(p.energy<maxEN) p.energy=Math.min(maxEN, p.energy+shrine.enRegen*dt);
+        if(p.hp<maxHP) p.hp=Math.min(maxHP, p.hp+(shrine.isPct?maxHP*shrine.hpRegen:shrine.hpRegen)*dt);
+        if(p.energy<maxEN) p.energy=Math.min(maxEN, p.energy+(shrine.isPct?maxEN*shrine.enRegen:shrine.enRegen)*dt);
         G.shrineEffect=Math.min(1,(G.shrineEffect||0)+dt*2);
       } else {
         G.shrineEffect=Math.max(0,(G.shrineEffect||0)-dt*2);
@@ -3052,7 +3226,7 @@ function updateEnemies(dt){
     // ← Change 0.82 to make ALL enemies faster (e.g. 1.0) or slower (e.g. 0.6)
     // The 0.4 multiplier is applied when the enemy is slowed by a skill
     const d=dist(e,p);
-    const spd=e.speed*0.82*(e.slowTimer>0?0.4:1)*60*dt;
+    const spd=e.speed*1.32*(e.slowTimer>0?0.4:1)*60*dt;
     const attackRange=e.range||50; // how close enemy must be to start attacking
     const stopDist=e.size+18;      // stop moving when this close (prevents overlapping)
     
@@ -3095,6 +3269,13 @@ function updateEnemies(dt){
       const slashType=e.weaponType==='axe'?'sword':e.weaponType==='hammer'?'sword':'sword';
       spawnSlash(e.x+Math.cos(angle)*e.size, e.y+Math.sin(angle)*e.size, angle, slashType,'#ff6060',0.85);
       
+      // Evasion check — LCK: +0.5% evasion chance per point (design table)
+      const evasionChance = getAttr('LCK') * 0.005; // 0.5% per LCK
+      if(Math.random() < evasionChance){
+        spawnFloatNum(p.x, p.y, 'EVADE', '#ffcc44', false);
+        return;
+      }
+
       // Shield absorption
       if(p.shield>0){
         const absorbed=Math.min(p.shield,dmg);
@@ -3121,7 +3302,10 @@ function playerDeath(){
   p.isDead=true;
   HAPTIC.death();
   G.paused=false;
-  
+
+  // Track deaths per zone — reset when entering a new zone (see selectZone)
+  p.zoneDeathCount=(p.zoneDeathCount||0)+1;
+
   document.getElementById('death-overlay').classList.add('show');
   let prog=0;
   const bar=document.getElementById('respawn-fill');
@@ -3130,7 +3314,15 @@ function playerDeath(){
     bar.style.width=prog+'%';
     if(prog>=100){
       clearInterval(t);
-      respawnPlayer();
+      if(p.zoneDeathCount>=3){
+        // 3 deaths in this zone → teleport to town
+        p.zoneDeathCount=0;
+        respawnPlayer();
+        selectZone(3); // town
+        showToast('⚰️ Defeated 3 times — retreated to town.');
+      } else {
+        respawnPlayer();
+      }
     }
   },100);
 }
@@ -3398,16 +3590,20 @@ function updateEnergy(dt){
   const p=G.player;
   const maxEn=getMaxEnergy();
   // Base energy regen
-  let enerRegen=G.energyRegen;
+  // Base energy regen: 2/s + WIS bonus (0.15/s per WIS) + INT bonus (0.1/s per INT) + class bonus + items
+  let enerRegen=G.energyRegen
+    + getAttr('WIS')*0.15   // ← WIS: +0.15 energy regen/s per point (design table)
+    + getAttr('INT')*0.1    // ← INT: +0.1 energy regen/s per point (design table)
+    + (p.classBonusEnRegen||0); // class starting bonus (Elementalist +2, Necromancer +1)
   // Item energy regen bonus
   Object.values(p.equipment).forEach(item=>{if(item&&item.stats&&item.stats.energyRegen)enerRegen+=item.stats.energyRegen;});
   if(p.energy<maxEn){
     p.energy=Math.min(maxEn,p.energy+enerRegen*dt);
   }
-  // HP regen from items
+  // HP regen: CON bonus (0.2/s per CON) + items
   const maxHP=getMaxHP();
   if(p.hp>0&&p.hp<maxHP){
-    let hpRegen=0;
+    let hpRegen=getAttr('CON')*0.2; // ← CON: +0.2 HP regen/s per point (design table)
     Object.values(p.equipment).forEach(item=>{if(item&&item.stats&&item.stats.hpRegen)hpRegen+=item.stats.hpRegen;});
     if(hpRegen>0) p.hp=Math.min(maxHP,p.hp+hpRegen*dt);
   }
@@ -3449,6 +3645,13 @@ function updateProjectiles(dt){
       if(dist(proj,e)<=e.size+proj.size){
         proj.hitTargets.add(e);
         dealDamage(e,proj.dmg,proj.isCrit,proj.color);
+
+        // Apply weapon perk on auto-shot projectile hit
+        if(!proj.skill){
+          const wpn=G.player&&G.player.equipment&&G.player.equipment.weapon;
+          const wDef=wpn&&WEAPON_DEFS[wpn.weaponType];
+          if(wDef&&wDef.perk) applyWeaponPerk(wDef.perk,e,proj.dmg,proj.isCrit);
+        }
         
         if(proj.skill){
           if(proj.skill.slow&&e.hp>0) e.slowTimer=proj.skill.slow;
@@ -4478,7 +4681,7 @@ function drawShopNPC(){
     ctx.fillStyle=active?'#a0e0ff':'#c0d0e0'; ctx.fillText('Shrine of Rest',s.x,s.y+37);
     if(active){
       ctx.font='10px serif'; ctx.fillStyle='rgba(100,220,255,0.8)';
-      ctx.fillText(`+${zone.shrine.hpRegen} HP/s  +${zone.shrine.enRegen} EN/s`,s.x,s.y+52);
+      ctx.fillText(s.isPct?`+${Math.round(s.hpRegen*100)}% HP/s  +${Math.round(s.enRegen*100)}% EN/s`:`+${s.hpRegen} HP/s  +${s.enRegen} EN/s`,s.x,s.y+52);
     }
   }
 
@@ -4512,6 +4715,12 @@ function drawShopNPC(){
     light_armor: {stall:'#201808',stroke:'#c08030',label:'◈ LEATHER',      labelColor:'#e0a040'},
     accessories: {stall:'#28101a',stroke:'#e060a0',label:'◇ JEWELS',       labelColor:'#ff80c0'},
     general:     {stall:'#1e0e30',stroke:'#9060c0',label:'★ GENERAL',      labelColor:'#c9a84c'},
+    legendary:          {stall:'#1a1000',stroke:'#c09020',label:'👑 LEGENDARY',         labelColor:'#f0d060'},
+    legendary_armor:   {stall:'#1a1000',stroke:'#c09020',label:'👑 LEGENDARY ARMOUR',  labelColor:'#f0d060'},
+    legendary_weapons: {stall:'#1a1000',stroke:'#c09020',label:'👑 LEGENDARY WEAPONS', labelColor:'#f0d060'},
+    swords:   {stall:'#3a1010',stroke:'#d06030',label:'⚔ SWORDS',   labelColor:'#e08060'},
+    axes:     {stall:'#3a1808',stroke:'#e07020',label:'🪓 AXES',     labelColor:'#f09040'},
+    hammers:  {stall:'#301818',stroke:'#b05030',label:'🔨 HAMMERS',  labelColor:'#d07050'},
   };
 
   const npcs=zone.shopNPCs||[zone.shopNPC];
@@ -5205,7 +5414,7 @@ function drawPlayer(){
 function drawRangeCircles(){
   const p=G.player;
   const ws=getWeaponAutoStats(p.equipment&&p.equipment.weapon);
-  const autoRange=ws.autoRange||0;
+  const autoRange=(ws.autoRange||0)+(G.player?.classRangerRange||0);
   if(!autoRange) return;
   ctx.save();
   ctx.setLineDash([4,4]);
@@ -5216,7 +5425,7 @@ function drawRangeCircles(){
   ctx.font='10px Cinzel, serif';
   ctx.textAlign='center';
   ctx.fillStyle='rgba(100,200,255,0.5)';
-  ctx.fillText(`Auto (${autoRange})`,p.x,p.y-autoRange-4);
+  // Range label removed — circle is self-explanatory
 
   // Enemy attack ranges — red for normal, gold dashed for bosses
   // (bosses also draw their own range ring in drawEnemy, this is for debug/showRanges mode)
@@ -5674,32 +5883,92 @@ function generateShopInventory(level, mode){
   const allSlots=['weapon','offhand','chest','legs','helm','gloves','boots','ring1','amulet'];
   let slots, countPer=3;
 
-  if(mode==='blades'){       slots=['weapon','weapon','weapon','weapon']; countPer=4;
-  } else if(mode==='daggers'){   slots=['weapon','weapon','weapon'];          countPer=4;
-  } else if(mode==='polearms'){  slots=['weapon','weapon','weapon'];          countPer=4;
-  } else if(mode==='scythes'){   slots=['weapon','weapon','weapon'];          countPer=4;
+  if(mode==='swords'){       slots=['weapon'];                            countPer=8;
+  } else if(mode==='axes'){        slots=['weapon'];                            countPer=8;
+  } else if(mode==='hammers'){     slots=['weapon'];                            countPer=8;
+  } else if(mode==='blades'){      slots=['weapon','weapon','weapon','weapon']; countPer=3;
+  } else if(mode==='daggers'){   slots=['weapon'];                            countPer=8;
+  } else if(mode==='polearms'){  slots=['weapon','weapon','weapon'];          countPer=3;
+  } else if(mode==='scythes'){   slots=['weapon'];                            countPer=8;
   } else if(mode==='bows'){      slots=['weapon','weapon'];                   countPer=4;
   } else if(mode==='staves'){    slots=['weapon','weapon','weapon','offhand'];countPer=3;
-  } else if(mode==='shields_mh'){slots=['weapon','weapon','weapon'];          countPer=4;
-  } else if(mode==='shields_oh'){slots=['offhand','offhand','offhand'];       countPer=4;
+  } else if(mode==='shields_mh'){slots=['weapon'];                            countPer=8;
+  } else if(mode==='shields_oh'){slots=['offhand'];                           countPer=8;
   } else if(mode==='shields'){   slots=['offhand','offhand','offhand','weapon'];countPer=3;
-  } else if(mode==='offhand'){   slots=['offhand','offhand','offhand'];       countPer=4;
-  } else if(mode==='heavy_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=3;
-  } else if(mode==='light_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=3;
-  } else if(mode==='accessories'){slots=['ring1','ring2','amulet'];           countPer=4;
-  } else if(mode==='all'){       slots=[...allSlots,...allSlots.slice(0,4)]; countPer=3;
+  } else if(mode==='offhand'){   slots=['offhand'];                           countPer=8;
+  } else if(mode==='heavy_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=4;
+  } else if(mode==='light_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=4;
+  } else if(mode==='accessories'){slots=['ring1','ring2','amulet'];           countPer=5;
+  } else if(mode==='all'){       slots=[...allSlots,...allSlots.slice(0,4)]; countPer=4;
+  } else if(mode==='legendary'){ // Legendary vendor: one of every slot type, forced Legendary rarity
+    const legendarySlots=['weapon','offhand','chest','legs','helm','gloves','boots','ring1','ring2','amulet'];
+    const legendaryItems=[];
+    legendarySlots.forEach(slot=>{
+      const lv=20;
+      const item=genItem(slot,lv,10);
+      item.rarity='Legendary';
+      if(slot==='weapon'){
+        const wTypes=['sword','axe','hammer','scythe','spear','spear_1h','dagger','staff','wand','shortbow','longbow'];
+        item.weaponType=wTypes[rand(0,wTypes.length-1)];
+        item.name=getWeaponName(item.weaponType,'Legendary');
+        item._iconType='weapon';
+      }
+      item.shopPrice=Math.round(itemSellValue(item)*5);
+      legendaryItems.push(item);
+    });
+    return legendaryItems;
+  } else if(mode==='legendary_armor'){ // Sennah: lv20 legendary armor+accessories, token+2000g each
+    const armorSlots=['chest','legs','helm','gloves','boots','ring1','ring2','amulet','offhand'];
+    return armorSlots.map(slot=>{
+      const item=genItem(slot,20,10);
+      item.rarity='Legendary';
+      item.requiresToken=true; // needs prestige token to purchase
+      item.shopPrice=2000;
+      return item;
+    });
+  } else if(mode==='legendary_weapons'){ // Tharyn: lv20 legendary weapons only, token+2000g each
+    const wTypes=['sword','axe','hammer','scythe','spear','spear_1h','dagger','staff','wand','shortbow','longbow'];
+    return wTypes.map(wt=>{
+      const item=genItem('weapon',20,10);
+      item.rarity='Legendary';
+      item.weaponType=wt;
+      item.name=getWeaponName(wt,'Legendary');
+      item._iconType='weapon';
+      // Recalculate stats at lv20 max
+      const ranges={sword:[18,24],axe:[20,30],hammer:[24,42],scythe:[23,29],spear:[30,34],spear_1h:[20,23],dagger:[16,18],offhand_dagger:[6,8],staff:[16,20],wand:[13,15],shortbow:[22,24],longbow:[24,28]};
+      const r=ranges[wt]||[18,24];
+      item.stats={dmg:r[1]}; // max stat for legendary
+      item.requiresToken=true;
+      item.shopPrice=2000;
+      return item;
+    });
   } else {                       slots=allSlots;                             countPer=2;
   }
 
   const uniqueSlots=[...new Set(slots)];
   const items=[];
+  // Clamp shop items to level bracket (lv1-5, 6-10, 11-15, 16-20)
+  const bracketMin = level<=5?1 : level<=10?6 : level<=15?11 : 16;
+  const bracketMax = level<=5?5 : level<=10?10 : level<=15?15 : 20;
   uniqueSlots.forEach(slot=>{
     for(let i=0;i<countPer;i++){
-      const lv=Math.max(1,level+rand(-1,3));
+      const lv=Math.max(bracketMin,Math.min(bracketMax, level+rand(-1,2)));
       const item=genItem(slot,lv);
       // Force weapon types to match vendor specialty
       if(slot==='weapon'){
-        if(mode==='blades'){
+        if(mode==='swords'){
+          item.weaponType='sword';
+          item.name=getWeaponName('sword',item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='axes'){
+          item.weaponType='axe';
+          item.name=getWeaponName('axe',item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='hammers'){
+          item.weaponType='hammer';
+          item.name=getWeaponName('hammer',item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='blades'){
           item.weaponType=['sword','axe','hammer','sword'][rand(0,3)];
           item.name=getWeaponName(item.weaponType,item.rarity);
           item._iconType='weapon';
@@ -5727,17 +5996,19 @@ function generateShopInventory(level, mode){
           item.weaponType='shield_mh';
           item.name=getWeaponName('shield_mh',item.rarity);
           item._iconType='weapon';
-          item.stats={armor:Math.round((3+lv*1.5)*RARITY_MULT[item.rarity]),CON:Math.round((1+lv*0.3)*RARITY_MULT[item.rarity])};
+          item.stats={armor:Math.round((3+lv*1.5)),CON:Math.round((1+lv*0.3))};
         }
       }
       if(slot==='offhand'){
         if(mode==='shields_oh'||mode==='shields'){
           item.offhandType='shield';
-          item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Shield';
-          item.icon='🛡️';
-          item.stats={armor:Math.round((4+lv*2)*RARITY_MULT[item.rarity]),blockChance:parseFloat((0.1+lv*0.01).toFixed(2))};
-          if(Math.random()<0.4) item.stats.CON=Math.round((1+lv*0.3)*RARITY_MULT[item.rarity]);
-          if(Math.random()<0.3) item.stats.hp=Math.round((6+lv*2.5)*RARITY_MULT[item.rarity]);
+          item.name='Shield';
+          item.icon='🛡️'; delete item._iconType;
+          const _shBr2=lv<=5?0:lv<=10?1:lv<=15?2:3;
+          const _shA2=[1,1,2,3][_shBr2];
+          item.stats={armor:_shA2, blockChance:parseFloat((0.1+_shBr2*0.05).toFixed(2))};
+          if(Math.random()<0.4) item.stats.CON=Math.round(1+lv*0.15);
+          if(Math.random()<0.3) item.stats.hp=Math.round(5+lv*1.5);
         } else if(mode==='offhand'){
           const roll=Math.random();
           if(roll<0.45){
@@ -5746,18 +6017,18 @@ function generateShopInventory(level, mode){
             item._iconType='weapon';
           } else if(roll<0.8){
             item.offhandType='focus';
-            item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Focus';
-            item.icon='🔮';
+            item.name='Focus';
+            item.icon='🔮'; delete item._iconType;
           } else {
             item.offhandType='shield';
-            item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Shield';
-            item.icon='🛡️';
+            item.name='Shield';
+            item.icon='🛡️'; delete item._iconType;
           }
         } else if(mode==='staves'){
           item.offhandType='focus';
-          item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Focus';
-          item.icon='🔮';
-          item.stats={INT:Math.round((2+lv*0.5)*RARITY_MULT[item.rarity]),WIS:Math.round((1+lv*0.3)*RARITY_MULT[item.rarity])};
+          item.name='Focus';
+          item.icon='🔮'; delete item._iconType;
+          item.stats={INT:Math.round((2+lv*0.5)),WIS:Math.round((1+lv*0.3))};
         }
       }
       const bump=['Common','Uncommon','Rare'];
@@ -5772,7 +6043,12 @@ function generateShopInventory(level, mode){
 
 function refreshShopInventory(mode){
   const m=mode||(G.currentShopNPC&&G.currentShopNPC.mode)||'general';
-  G.shopInventory=generateShopInventory(G.player?G.player.level:1, m);
+  const inv=generateShopInventory(G.player?G.player.level:1, m);
+  G.shopInventory=inv;
+  // Update the persistent cache for this NPC
+  if(!G.shopInventoryByNpc) G.shopInventoryByNpc={};
+  const npcKey=G.currentShopNPC?G.currentShopNPC.name:'_default';
+  G.shopInventoryByNpc[npcKey]=inv;
 }
 
 // ======================================================
@@ -5868,7 +6144,13 @@ function openShop(npc){
   G.paused=true;
   const activeNpc=npc||G.activeNPC||(ZONES[G.zone].shopNPCs&&ZONES[G.zone].shopNPCs[0])||ZONES[G.zone].shopNPC;
   G.currentShopNPC=activeNpc;
-  refreshShopInventory(activeNpc&&activeNpc.mode);
+  // Only generate inventory if this NPC hasn't been visited yet (persist until explicit reroll)
+  const npcKey=activeNpc?activeNpc.name:'_default';
+  if(!G.shopInventoryByNpc) G.shopInventoryByNpc={};
+  if(!G.shopInventoryByNpc[npcKey]){
+    G.shopInventoryByNpc[npcKey]=generateShopInventory(G.player?G.player.level:1, activeNpc&&activeNpc.mode);
+  }
+  G.shopInventory=G.shopInventoryByNpc[npcKey];
   renderShopPanel();
   document.getElementById('shop-overlay').classList.add('open');
 }
@@ -5908,7 +6190,7 @@ function renderShopPanel(){
   if(activeTab==='buy'){
     html+=`<div style="padding:10px;display:flex;flex-direction:column;gap:6px">`;
     G.shopInventory.forEach((item,i)=>{
-      const canAfford=p.gold>=item.shopPrice;
+      const canAfford=item.requiresToken?(p.gold>=2000&&(p.prestigeTokens||0)>=1):(p.gold>=item.shopPrice);
       const stats=fmtStats(item.stats,' ');
       html+=`<div class="shop-item ${canAfford?'':'shop-item-poor'}" onclick="${canAfford?`buyItem(${i})`:''}">
         <div class="spi-icon rarity-${item.rarity.toLowerCase()}">${itemIconHTML(item,28)}</div>
@@ -5916,7 +6198,7 @@ function renderShopPanel(){
           <div class="spi-name rarity-${item.rarity.toLowerCase()}">${item.name}</div>
           <div class="spi-stats">${stats}</div>
         </div>
-        <div class="shop-price ${canAfford?'can-afford':'cant-afford'}">⚜${item.shopPrice}</div>
+        <div class="shop-price ${canAfford?'can-afford':'cant-afford'}">${item.requiresToken?'⚔️+':''}⚜${item.shopPrice}</div>
       </div>`;
     });
     html+=`</div>`;
@@ -5945,9 +6227,25 @@ function renderShopPanel(){
       html+=`</div>`;
     }
   } else if(activeTab==='reroll'){
+    const rerollCost=getRerollCost();
+    const npcKey=G.currentShopNPC?G.currentShopNPC.name:'_default';
+    const rerollEntry=G.rerollData&&G.rerollData[npcKey];
+    const msLeft=rerollEntry?Math.max(0,180000-(Date.now()-rerollEntry.lastTime)):0;
+    const minsLeft=Math.ceil(msLeft/60000);
+    const canAffordReroll=p.gold>=rerollCost;
     html+=`<div style="padding:16px;text-align:center">
-      <div style="color:var(--text2);font-size:0.85rem;margin-bottom:14px">Reroll shop inventory for 20 gold.</div>
-      <button onclick="rerollShop()" style="font-family:'Cinzel',serif;font-size:0.85rem;padding:10px 24px;background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);cursor:pointer">REROLL — ⚜20</button>
+      <div style="color:var(--text2);font-size:0.85rem;margin-bottom:6px">Reroll this vendor's stock.</div>
+      <div style="color:var(--text2);font-size:0.75rem;margin-bottom:14px">
+        ${rerollCost>20?`Price doubled — resets in ~${minsLeft} min`:'Price resets after 3 minutes of not rerolling.'}
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;font-size:0.75rem;color:var(--text2)">
+        <span style="color:${rerollCost===20?'var(--gold)':'#555'}">⚜20</span>
+        <span>→</span>
+        <span style="color:${rerollCost===40?'var(--gold)':'#555'}">⚜40</span>
+        <span>→</span>
+        <span style="color:${rerollCost===80?'var(--gold)':'#555'}">⚜80</span>
+      </div>
+      <button onclick="rerollShop()" ${!canAffordReroll?'disabled':''} style="font-family:'Cinzel',serif;font-size:0.85rem;padding:10px 24px;background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);cursor:pointer;${!canAffordReroll?'opacity:0.5':''}">REROLL — ⚜${rerollCost}</button>
     </div>`;
   } else if(activeTab==='respec'){
     const totalAllocated=Object.values(p.allocatedAttrs||{}).reduce((s,v)=>s+v,0);
@@ -5999,9 +6297,18 @@ function respecAttrs(){
 function buyItem(idx){
   const p=G.player;
   const item=G.shopInventory[idx];
-  if(!item||p.gold<item.shopPrice) return;
+  if(!item) return;
+  // Legendary token vendors require a prestige token + 2000g
+  if(item.requiresToken){
+    if((p.prestigeTokens||0)<1){ showToast('⚔️ Requires a Prestige Token (reach Lv 20+)'); return; }
+    if(p.gold<2000){ showToast('⚜ Need 2000 gold'); return; }
+    p.prestigeTokens--;
+    p.gold-=2000;
+  } else {
+    if(p.gold<item.shopPrice) return;
+    p.gold-=item.shopPrice;
+  }
   if(p.inventory.length>=40){ showToast('Bag full!'); return; }
-  p.gold-=item.shopPrice;
   const bought={...item};
   delete bought.shopPrice;
   p.inventory.push(bought);
@@ -6035,11 +6342,28 @@ function sellAllItems(){
   updateHUD();
 }
 
+function getRerollCost(){
+  // Per-vendor reroll cost: starts at 20, doubles each use (20→40→80), resets after 3 min
+  const npcKey = G.currentShopNPC ? G.currentShopNPC.name : '_default';
+  if(!G.rerollData) G.rerollData={};
+  const d = G.rerollData[npcKey];
+  if(!d) return 20;
+  // Check reset: 3 minutes = 180000ms
+  if(Date.now()-d.lastTime > 180000){ delete G.rerollData[npcKey]; return 20; }
+  return d.cost;
+}
+
 function rerollShop(){
   const p=G.player;
-  if(p.gold<20){ showToast('Need 20 gold to reroll'); return; }
-  p.gold-=20;
-  refreshShopInventory();
+  const cost=getRerollCost();
+  if(p.gold<cost){ showToast(`Need ⚜${cost} to reroll`); return; }
+  p.gold-=cost;
+  // Double for next reroll, cap at 80 (3 tiers: 20→40→80)
+  const npcKey = G.currentShopNPC ? G.currentShopNPC.name : '_default';
+  if(!G.rerollData) G.rerollData={};
+  const nextCost = Math.min(80, cost*2);
+  G.rerollData[npcKey]={cost:nextCost, lastTime:Date.now()};
+  refreshShopInventory(G.currentShopNPC&&G.currentShopNPC.mode);
   renderShopPanel();
   updateHUD();
   showToast('Shop restocked!');
@@ -6049,10 +6373,10 @@ function selectZone(idx){
   G.zone=idx;
   G.enemies=[]; G.corpses=[]; G.projectiles=[]; G.particles=[]; G.slashEffects=[]; G.groundItems=[];
   G.shopOpen=false;
-  G.portalCooldown=2.0; // prevent re-entering portal immediately
-  // Place player at center of new zone
+  G.portalCooldown=2.0;
   G.player.x=G.worldSize/2; G.player.y=G.worldSize/2;
   G.cam={x:G.player.x, y:G.player.y};
+  G.player.zoneDeathCount=0; // reset death counter on zone change
   spawnInitialEnemies();
   closePanel('zone');
   G.paused=false;
@@ -6190,7 +6514,7 @@ function renderEquipPanel(){
       ${item?`
         <div class="equip-item-icon rarity-${item.rarity.toLowerCase()}">${itemIconHTML(item,32)}</div>
         <div class="equip-item-name rarity-${item.rarity.toLowerCase()}">${item.name}</div>
-        ${item.weaponType?`<div style="font-size:0.65rem;color:var(--text2);margin-top:1px">${WEAPON_DEFS[item.weaponType]?WEAPON_DEFS[item.weaponType].hands+'H · ':''} ${WEAPON_DEFS[item.weaponType]?'Range '+WEAPON_DEFS[item.weaponType].autoRange:''}</div>`:''}
+        ${item.weaponType?`<div style="font-size:0.65rem;color:var(--text2);margin-top:1px">${WEAPON_DEFS[item.weaponType]?WEAPON_DEFS[item.weaponType].hands+'H · ':''} ${WEAPON_DEFS[item.weaponType]?'Range '+(WEAPON_DEFS[item.weaponType].autoRange+(G.player?.classRangerRange||0)):''}</div>`:''}
         <div class="equip-item-stats">${statsStr}</div>
         <button class="equip-unequip-btn" onclick="unequipItem('${slot}',event)">✕</button>
       `:`<div class="equip-slot-empty">${hasOptions?'Tap to equip':'Empty'}</div>`}
@@ -6204,7 +6528,9 @@ function renderEquipPanel(){
 function openSlotPicker(slot){
   const p=G.player;
   // Offhand daggers cannot go in main weapon slot
-  const matching=p.inventory.filter(i=>i.slot===slot && !(slot==='weapon' && i.weaponType==='offhand_dagger'));
+  const isRingSlot=slot==='ring1'||slot==='ring2';
+  const matchSlot=isRingSlot?'ring':slot;
+  const matching=p.inventory.filter(i=>i.slot===matchSlot && !(slot==='weapon' && i.weaponType==='offhand_dagger'));
   // Build a modal inside the equip-inv panel
   const existing=document.getElementById('slot-picker-modal');
   if(existing) existing.remove();
@@ -6822,6 +7148,8 @@ function setProfileChars(pid,a){localStorage.setItem('aether_profile_chars_'+pid
 function saveCharData(cid,d){localStorage.setItem('aether_char_'+cid,JSON.stringify(d));}
 function loadCharData(cid){try{const r=localStorage.getItem('aether_char_'+cid);return r?JSON.parse(r):null;}catch(e){return null;}}
 function deleteCharData(cid){localStorage.removeItem('aether_char_'+cid);}
+function getProfileGold(pid){try{return parseInt(localStorage.getItem('aether_gold_'+pid)||'0',10);}catch(e){return 0;}}
+function setProfileGold(pid,g){localStorage.setItem('aether_gold_'+pid,String(Math.max(0,g||0)));}
 
 function renderProfileScreen(){
   const profiles=getProfiles();
@@ -6920,22 +7248,58 @@ function renderCharSelectScreen(){
     list.appendChild(ne);
   }
 }
+function goToMainMenu(){
+  showConfirm('Return to main menu? Unsaved progress will be lost.',()=>{
+    closeMainMenu();
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+    G.paused=true;
+    document.querySelectorAll('.drawer-overlay').forEach(d=>d.classList.remove('open'));
+    showScreen('title-screen');
+  });
+}
+
 function loadCharacter(pid,cid){
   const data=loadCharData(cid);if(!data){showToast('Save not found');return;}
   G.activeProfileId=pid;G.currentCharId=cid;
-  G.player=data.player;G.zone=data.zone||0;
+  G.player=data.player;G.zone=3; // always start in town on character load
+  // Sync gold from the profile-shared gold pool (all characters share one pool)
+  if(pid) G.player.gold=getProfileGold(pid);
   G.cam={x:G.player.x,y:G.player.y};
   G.enemies=[];G.corpses=[];G.projectiles=[];G.particles=[];G.slashEffects=[];G.groundItems=[];
   G.autoAttack=true;G.paused=false;G.shopOpen=false;
   G.spawnTimer=0;G.spawnInterval=1.5;G.maxEnemies=20;
   G.energyRegen=2;G.worldSize=2400;G.allies=[];
-  G.showRanges=true;G.showHPBars=true;G.zoom=1.0;
+  G.showRanges=true;G.showHPBars=true;G.zoom=1.0;G.speedCap=8;
+  G.shopInventory=generateShopInventory(G.player.level||1);
+  G.rerollData={};
+  G.portals=[
+    {x:1200,y:400,  toZone:3,label:'To Town',color:'#a040ff',pulseT:0},
+    {x:2000,y:1200, toZone:3,label:'To Town',color:'#a040ff',pulseT:1},
+    {x:400, y:2000, toZone:3,label:'To Town',color:'#a040ff',pulseT:2},
+  ];
+  // Restore class bonus properties (may be missing on old saves)
+  const cb=G.player.cls;
+  G.player.classBonusArmor   = G.player.classBonusArmor   ?? (cb==='warrior'?3:cb==='assassin'?1:cb==='dervish'?1:0);
+  G.player.classBonusCritMult= G.player.classBonusCritMult?? (cb==='assassin'?0.2:0);
+  G.player.classDervishHeal  = G.player.classDervishHeal  ?? (cb==='dervish');
+  G.player.classRangerRange  = G.player.classRangerRange  ?? (cb==='ranger'?10:0);
+  G.player.classBonusEnRegen = G.player.classBonusEnRegen ?? (cb==='elementalist'?2:cb==='necromancer'?1:0);
+  G.player.classImmuneBleed  = G.player.classImmuneBleed  ?? (cb==='necromancer');
+  G.player.dervishHitCount   = G.player.dervishHitCount   ?? 0;
+  G.player.axeHitCount       = G.player.axeHitCount       ?? 0;
+  G.player.spearHitCount     = G.player.spearHitCount     ?? 0;
+  G.player.deathCount        = G.player.deathCount        ?? 0;
   if(!G.player.learnedSkills)G.player.learnedSkills=[...CLASSES[G.player.cls].startSkills];
   const pool=CLASS_SKILL_POOLS[G.player.cls]||[];
   pool.forEach(sk=>{if(!G.player.learnedSkills.includes(sk))G.player.learnedSkills.push(sk);});
   if(!G.player.attrPoints)G.player.attrPoints=0;
   if(!G.player.allocatedAttrs)G.player.allocatedAttrs={STR:0,DEX:0,CON:0,INT:0,WIS:0,SPD:0,LCK:0};
-  G.player.cooldowns={};
+  if(!G.player.activeBuffs)G.player.activeBuffs=[];
+  if(!G.player.equippedSkills||!G.player.equippedSkills.length){
+    const shuffled=[...G.player.learnedSkills].sort(()=>Math.random()-0.5);
+    G.player.equippedSkills=shuffled.slice(0,8);
+  }
+  G.player.cooldowns={};G.player.shield=G.player.shield||0;
   spawnInitialEnemies();buildSkillBar();updateHUD();
   document.querySelectorAll('.drawer-overlay').forEach(d=>d.classList.remove('open'));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -6951,6 +7315,8 @@ function saveCurrentChar(){
   if(!G.currentCharId)G.currentCharId='c'+Date.now().toString(36);
   const cid=G.currentCharId,pid=G.activeProfileId;
   saveCharData(cid,{player:G.player,zone:G.zone,ts:Date.now()});
+  // Sync current gold back to the profile shared pool
+  setProfileGold(pid,G.player.gold);
   const chars=getProfileChars(pid);
   const meta={id:cid,cls:G.player.cls,level:G.player.level,zone:G.zone,ts:Date.now(),gold:G.player.gold};
   const idx=chars.findIndex(c=>c.id===cid);
@@ -6958,7 +7324,10 @@ function saveCurrentChar(){
   setProfileChars(pid,chars);showToast('Saved ✓');
 }
 function switchCharacter(){
-  saveCurrentChar();closeMainMenu();
+  saveCurrentChar();
+  G.currentCharId=null; // clear so a new character gets a fresh ID
+  G.paused=true; // pause game while browsing characters
+  closeMainMenu();
   renderCharSelectScreen();showScreen('charselect-screen');
 }
 function deleteCharacter(pid,cid){
