@@ -357,31 +357,32 @@
   /* ========== SKILL BAR ========== */
   /* Landscape: skill-bar is a row, auto-btn on left of slots */
   #skill-bar { display:flex; gap:5px; flex-direction:row; align-items:flex-end; pointer-events:all; }
-  #skill-slots { display:flex; gap:4px; flex-direction:row; flex-wrap:wrap; justify-content:center; max-width:212px; }
+  #skill-slots { display:flex; gap:4px; flex-direction:row; flex-wrap:wrap; justify-content:center; max-width:260px; }
   /* Put auto-btn before slots visually */
   #auto-attack-btn { order:-1; align-self:flex-end; }
   .skill-slot {
-    width:48px; height:48px;
+    width:60px; height:60px;
     background:rgba(8,8,18,0.9);
     border:2px solid var(--border);
     cursor:pointer; position:relative;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    font-size:1.35rem; transition:border-color 0.1s, box-shadow 0.1s;
+    font-size:1.6rem; transition:border-color 0.1s, box-shadow 0.1s;
     pointer-events:all; touch-action:manipulation;
   }
   .skill-slot:active { border-color:var(--gold); box-shadow:0 0 10px rgba(201,168,76,0.4); }
   .skill-slot .cooldown-overlay {
     position:absolute; inset:0; background:rgba(0,0,0,0.65);
     display:flex; align-items:center; justify-content:center;
-    font-size:0.8rem; color:#fff; font-family:'Cinzel',serif; border-radius:0;
+    font-size:1rem; color:#fff; font-family:'Cinzel',serif; border-radius:0;
   }
-  .skill-slot .skill-cost { position:absolute; bottom:2px; right:3px; font-size:0.58rem; color:#6090d0; }
-  .skill-slot .skill-key  { position:absolute; top:2px; left:3px; font-size:0.55rem; color:var(--text2); }
+  .skill-slot .skill-cost { position:absolute; bottom:2px; right:3px; font-size:0.6rem; color:#6090d0; }
+  .skill-slot .skill-key  { position:absolute; top:2px; left:3px; font-size:0.58rem; color:var(--text2); }
+  .skill-slot .skill-type { position:absolute; top:2px; right:3px; font-size:0.65rem; opacity:0.75; }
   #auto-attack-btn {
-    font-family:'Cinzel',serif; font-size:0.58rem; line-height:1.2;
-    padding:4px 6px; background:rgba(8,8,18,0.9);
+    font-family:'Cinzel',serif; font-size:0.6rem; line-height:1.2;
+    padding:4px 5px; background:rgba(8,8,18,0.9);
     border:1px solid var(--border); color:var(--text2);
-    cursor:pointer; pointer-events:all; letter-spacing:0.05em; text-align:center; width:48px;
+    cursor:pointer; pointer-events:all; letter-spacing:0.05em; text-align:center; width:52px;
   }
   #auto-attack-btn.on { border-color:#c04040; color:#c04040; background:rgba(80,10,10,0.5); }
 
@@ -389,9 +390,9 @@
   @media (orientation: portrait) {
     #bottom-bar { align-items:flex-end; }
     #skill-bar { flex-direction:column; position:absolute; right:8px; bottom:10px; }
-    #skill-slots { flex-direction:row; flex-wrap:wrap; width:100px; justify-content:center; }
-    .skill-slot { width:46px; height:46px; font-size:1.2rem; }
-    #auto-attack-btn { width:46px; order:-1; }
+    #skill-slots { flex-direction:row; flex-wrap:wrap; width:128px; justify-content:center; }
+    .skill-slot { width:60px; height:60px; font-size:1.5rem; }
+    #auto-attack-btn { width:60px; order:-1; }
   }
 
   /* ========== COMBAT LOG ========== */
@@ -727,6 +728,51 @@
   }
   #toast.show { opacity:1; }
 
+  /* ========== ENEMY STATS PANEL ========== */
+  #enemy-stats-panel {
+    position:fixed; z-index:500;
+    background:rgba(8,8,20,0.96); border:1px solid var(--border);
+    padding:0; min-width:180px; max-width:220px;
+    display:none; flex-direction:column;
+    box-shadow:0 4px 24px rgba(0,0,0,0.7);
+    pointer-events:all;
+    top:120px; right:12px;
+  }
+  #enemy-stats-panel.visible { display:flex; }
+  #esp-header {
+    display:flex; align-items:center; gap:6px;
+    padding:7px 10px; background:rgba(20,10,30,0.9);
+    border-bottom:1px solid var(--border); cursor:grab;
+    user-select:none;
+  }
+  #esp-header.dragging { cursor:grabbing; }
+  #esp-icon { font-size:1.4rem; flex-shrink:0; }
+  #esp-name { font-family:'Cinzel',serif; font-size:0.82rem; color:var(--gold); flex:1; }
+  #esp-close {
+    background:none; border:none; color:var(--text2);
+    font-size:1rem; cursor:pointer; padding:0 2px; line-height:1;
+  }
+  #esp-close:hover { color:var(--gold); }
+  #esp-body { padding:8px 10px; display:flex; flex-direction:column; gap:5px; }
+  .esp-bar-row { display:flex; align-items:center; gap:5px; }
+  .esp-bar-label { font-size:0.62rem; color:var(--text2); width:14px; flex-shrink:0; }
+  .esp-bar-bg { flex:1; height:7px; background:#1a1a2a; border:1px solid #333; position:relative; }
+  .esp-bar-fill { height:100%; transition:width 0.15s; }
+  .esp-bar-fill.hp-fill { background:linear-gradient(90deg,#8b2020,#c04040); }
+  .esp-bar-val { font-size:0.58rem; color:#bbb; white-space:nowrap; }
+  .esp-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px 8px; margin-top:2px; }
+  .esp-stat { font-size:0.68rem; }
+  .esp-stat-k { color:var(--text2); }
+  .esp-stat-v { color:var(--gold2); font-family:'Cinzel',serif; }
+  .esp-type-badge {
+    font-size:0.6rem; font-family:'Cinzel',serif; letter-spacing:0.05em;
+    padding:1px 6px; border:1px solid; display:inline-block; margin-bottom:2px;
+  }
+  .esp-type-humanoid  { border-color:#6080c0; color:#8090d0; }
+  .esp-type-beast     { border-color:#806040; color:#a08060; }
+  .esp-type-undead    { border-color:#6040a0; color:#8060c0; }
+  .esp-type-boss      { border-color:var(--legendary); color:var(--legendary); }
+
   /* ========== CONFIRM DIALOG ========== */
   #confirm-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,0.8);
@@ -897,7 +943,6 @@
   <div class="title-sep"></div>
   <div id="title-btns" style="display:flex;flex-direction:column;gap:10px;align-items:center">
     <button class="btn primary" onclick="showScreen('profile-screen');renderProfileScreen()">PLAY</button>
-    <button class="btn" onclick="requestFullscreen()" style="font-size:0.75rem;opacity:0.7">⛶ FULLSCREEN</button>
   </div>
 </div>
 
@@ -992,7 +1037,6 @@
         <div id="zone-info">ASHFIELDS</div>
       </div>
       <div id="top-right-btns">
-        <button class="hud-icon-btn" onclick="isFullscreen()?exitFullscreen():requestFullscreen()" title="Fullscreen">⛶</button>
         <button class="hud-icon-btn" onclick="openMainMenu()">&#9776;</button>
         <button class="hud-icon-btn" onclick="openPanel('char')">&#128100;</button>
         <div style="position:relative;display:flex;align-items:center">
@@ -1134,6 +1178,34 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- ENEMY STATS PANEL -->
+<div id="enemy-stats-panel">
+  <div id="esp-header">
+    <span id="esp-icon">👹</span>
+    <span id="esp-name">Enemy</span>
+    <button id="esp-close" onclick="closeEnemyPanel()">✕</button>
+  </div>
+  <div id="esp-body">
+    <div class="esp-bar-row">
+      <span class="esp-bar-label">HP</span>
+      <div class="esp-bar-bg"><div class="esp-bar-fill hp-fill" id="esp-hp-bar" style="width:100%"></div></div>
+      <span class="esp-bar-val" id="esp-hp-val">—</span>
+    </div>
+    <div class="esp-stat-grid" id="esp-stats"></div>
+  </div>
+</div>
+
+<!-- SHARED CHEST OVERLAY -->
+<div id="chest-overlay" class="drawer-overlay" onclick="closePanelOutside(event,'chest')">
+  <div class="drawer" id="chest-drawer">
+    <div class="drawer-header">
+      <span>🗄 SHARED STASH</span>
+      <button class="drawer-close" onclick="closeChest()">✕</button>
+    </div>
+    <div id="chest-body" style="padding:10px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 <!-- CONFIRM DIALOG -->
 <div id="confirm-overlay">
   <div id="confirm-box">
@@ -1146,9 +1218,67 @@
 </div>
 
 <script>
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║           AETHERHAVEN RPG — FULL SOURCE GUIDE                   ║
+// ║     Use Ctrl+F in VS Code to jump to any section below          ║
+// ╠══════════════════════════════════════════════════════════════════╣
+// ║  SECTION                    │ WHAT YOU CAN CHANGE               ║
+// ╠══════════════════════════════════════════════════════════════════╣
+// ║  DATA DEFINITIONS           │                                   ║
+// ║    CLASSES                  │ class stats, HP, energy, colors   ║
+// ║    ALL_SKILLS               │ skill damage, cost, cooldown, type║
+// ║    WEAPON_DEFS              │ weapon range, speed, damage mult  ║
+// ║    ARMOR_DEFS               │ armor bonus values                ║
+// ║    ENEMY_DEFS               │ enemy HP, damage, speed, size     ║
+// ║    ZONES                    │ which enemies per zone, counts    ║
+// ║    RARITY_WEIGHTS           │ drop rate chances                 ║
+// ╠══════════════════════════════════════════════════════════════════╣
+// ║  GAME STATE                 │ G object — holds ALL runtime data ║
+// ║  HELPERS                   │ rand(), dist(), lerp()            ║
+// ║  ITEM GENERATION            │ genItem(), item stat rolls        ║
+// ║  INIT / BOOT                │ startGame(), boot()               ║
+// ║  UPDATE LOOP                │ update(), per-frame game logic    ║
+// ║    updatePlayer             │ player movement, speed            ║
+// ║    updateEnemies            │ enemy AI, attack logic            ║
+// ║    updateProjectiles        │ arrows, bolts, spells in flight   ║
+// ║    updateGroundItems        │ gold magnet, loot pickup radius   ║
+// ║    updateCorpses            │ graveyard cross fade timer        ║
+// ║  COMBAT                     │ dealDamage(), killEnemy()         ║
+// ║  SPAWNING                   │ spawnEnemy(), spawnInitialEnemies ║
+// ║  RENDER LOOP                │ render(), drawPlayer(), drawEnemy ║
+// ║    drawPlayer               │ player body, weapons, offhand     ║
+// ║    drawEnemy                │ enemy body, archetypes, weapons   ║
+// ║    drawCorpses              │ small grave crosses               ║
+// ║    drawGroundItems          │ gold coins, loot on ground        ║
+// ║    drawShopNPC              │ town layout, vendors, shrine      ║
+// ║  SKILLS PANEL               │ renderSkillsPanel(), clear button ║
+// ║  SHOP SYSTEM                │ generateShopInventory(), modes    ║
+// ║  SHARED STASH               │ openChest(), localStorage         ║
+// ║  LEVEL UP                   │ checkLevelUp(), XP formula        ║
+// ║  HUD / UI                   │ updateHUD(), bars, panels         ║
+// ║  AUDIO / HAPTIC             │ SFX, vibration patterns           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
 // ======================================================
 // DATA DEFINITIONS
 // ======================================================
+// ──────────────────────────────────────────────────────
+// CLASSES
+// Each class is a character archetype. Fields:
+//   name        — display name shown in UI
+//   icon        — emoji shown on character select screen
+//   desc        — short description shown to the player
+//   color       — hex color used for the class accent/glow
+//   baseStats   — starting attribute values (see stat guide below)
+//                 STR=physical damage, DEX=crit/dodge, CON=HP/armor
+//                 INT=spell damage, WIS=energy regen, SPD=move speed
+//                 LCK=crit chance & loot quality
+//   hpBase      — base max HP at level 1
+//   energyBase  — base max energy at level 1 (used to cast skills)
+//   startSkills — list of skill IDs given for free at game start
+//   sprite.body  — skin/body color drawn on canvas (hex)
+//   sprite.armor — armor color drawn on canvas (hex)
+// ──────────────────────────────────────────────────────
 const CLASSES = {
   warrior:     { name:'Warrior',     icon:'⚔️',  desc:'Melee tank with high HP and armor.',           color:'#c04040', baseStats:{STR:10,DEX:6, CON:10,INT:3, WIS:4, SPD:6, LCK:2 }, hpBase:120,energyBase:50,  startSkills:['strike','heal','mana_surge_w'],  sprite:{body:'#b07030',armor:'#607080'} },
   ranger:      { name:'Ranger',      icon:'🏹',  desc:'Agile archer with speed and range.',           color:'#40a060', baseStats:{STR:6, DEX:10,CON:6, INT:5, WIS:7, SPD:9, LCK:5 }, hpBase:80, energyBase:70,  startSkills:['quick_shot','heal','mana_surge_r'],sprite:{body:'#609040',armor:'#405030'} },
@@ -1160,6 +1290,48 @@ const CLASSES = {
 // Class-specific mana regen aliases (same effect, different key so each class has own)
 // These are added to ALL_SKILLS below
 
+// ──────────────────────────────────────────────────────
+// ALL SKILLS — every skill in the game
+// Each skill entry has these fields:
+//   id         — the skill's unique key (must match the object key)
+//   name       — display name shown in the skills panel and hotbar tooltip
+//   icon       — emoji shown on the skill button in the hotbar
+//   desc       — description shown in the skills panel
+//   category   — 'Attack', 'Buff', 'Defense', 'Spell', 'Utility', 'Passive'
+//                This is just a label — it doesn't affect behavior
+//   cost       — energy cost to activate (player needs this much energy)
+//                ← Lower this to make skills cheaper, higher to make them cost more
+//   cooldown   — seconds before this skill can be used again
+//                ← Lower = can spam more often, Higher = more strategic
+//   attr       — which stat scales the skill's damage:
+//                'STR'=strength, 'DEX'=dexterity, 'INT'=intelligence, 'CON'=constitution
+//   scale      — damage multiplier applied to the attr stat
+//                e.g. scale:1.5 with STR:10 = +15 bonus damage
+//   dmgBase    — flat base damage before any scaling
+//                ← This is the main number to change to buff/nerf a skill
+//   range      — how far the skill can reach in pixels
+//   type       — determines HOW the skill behaves:
+//                'melee'       = instant damage in range
+//                'aoe_self'    = hits all enemies in radius around player
+//                'projectile'  = fires a projectile
+//                'dash_attack' = dashes forward then hits
+//                'heal'        = restores HP
+//                'heal_dot'    = heals over time (multiple ticks)
+//                'heal_pct'    = heals a percentage of max HP
+//                'buff'        = applies a stat buff for duration seconds
+//                'utility'     = special effect (taunt, summon, etc.)
+//   aoe        — true = also hits nearby enemies (splash effect)
+//   buff       — {STAT: amount} applied when type='buff', e.g. {STR:5}
+//   duration   — seconds the buff lasts
+//   stun       — seconds the enemy is stunned after being hit
+//   dot        — {dmg, ticks} = damage over time (dmg per tick, number of ticks)
+//   shield     — HP absorption shield amount
+//   amount     — HP restored (heal skills only)
+//   lifesteal  — 0.0-1.0 fraction of damage converted to HP
+//   execute    — true = deals triple damage if enemy is below 20% HP
+//   spread     — number of arrows fired at once (projectile skills)
+//   summon     — type of ally to summon (necromancer skills)
+// ──────────────────────────────────────────────────────
 const ALL_SKILLS = {
   // ── WARRIOR (16 skills) ──────────────────────────────────────
   strike:       {id:'strike',       name:'Strike',        icon:'⚔️', desc:'A powerful melee blow.',                     category:'Attack',  cost:5,  cooldown:1.5, attr:'STR',scale:1.5,dmgBase:15,range:60,  type:'melee'},
@@ -1336,22 +1508,47 @@ function staffElement(name){
   return 'arcane';
 }
 
+// ──────────────────────────────────────────────────────
+// WEAPON DEFINITIONS
+// Each weapon type defines how it behaves in combat. Fields:
+//   name       — display name shown in inventory/shop
+//   hands      — 1 = one-handed (can equip an offhand too)
+//                2 = two-handed (offhand slot is locked/empty)
+//   autoType   — how auto-attack fires:
+//                'melee'      = swings at close range
+//                'aoe_melee'  = swings and hits ALL nearby enemies
+//                'bolt'       = fires a magic projectile
+//                'arrow'      = fires a physical arrow
+//                'none'       = no auto-attack (offhand-only items)
+//   autoRange  — how far (in pixels) the weapon can reach/fire
+//                Melee swords ~62, pikes ~120, longbows ~300
+//   cooldown   — seconds between each auto-attack (lower = faster)
+//   slashType  — type of visual swing effect shown on attack
+//   slashColor — hex color of the swing/flash effect
+//   dmgMult    — multiplies base damage (1.0 = normal, 1.5 = +50%)
+//   stat       — which attribute scales this weapon's damage
+//                STR=strength, DEX=dexterity, INT=intelligence, CON=constitution
+//   aoe        — true = auto-attack hits multiple enemies (scythe)
+// ──────────────────────────────────────────────────────
 const WEAPON_DEFS = {
   // One-handed (can pair with offhand)
-  sword:          {name:'Sword',          hands:1, autoType:'melee',   autoRange:60,  cooldown:1.0, slashType:'sword',     slashColor:'#c0d0e0', dmgMult:1.0, stat:'STR'},
-  axe:            {name:'Axe',            hands:1, autoType:'melee',   autoRange:65,  cooldown:1.1, slashType:'sword',     slashColor:'#e09040', dmgMult:1.1, stat:'STR'},
+  sword:          {name:'Sword',          hands:1, autoType:'melee',   autoRange:62,  cooldown:1.0, slashType:'sword',     slashColor:'#c0d0e0', dmgMult:1.0, stat:'STR'},
+  axe:            {name:'Axe',            hands:1, autoType:'melee',   autoRange:66,  cooldown:1.1, slashType:'sword',     slashColor:'#e09040', dmgMult:1.1, stat:'STR'},
   dagger:         {name:'Dagger',         hands:1, autoType:'melee',   autoRange:45,  cooldown:0.7, slashType:'dagger',    slashColor:'#c8c020', dmgMult:0.7, stat:'DEX', mainHandOnly:true},
   offhand_dagger: {name:'Offhand Dagger', hands:1, autoType:'none',    autoRange:0,   cooldown:999, slashType:'dagger',    slashColor:'#c8c020', dmgMult:0,   stat:'DEX', offhandOnly:true, noAuto:true},
   wand:           {name:'Wand',           hands:1, autoType:'bolt',    autoRange:150, cooldown:0.8, slashType:'muzzle',    slashColor:'#a040ff', dmgMult:0.8, stat:'INT'},
   focus:          {name:'Focus',          hands:1, autoType:'none',    autoRange:0,   cooldown:999, slashType:'muzzle',    slashColor:'#4080ff', dmgMult:0,   stat:'INT', noAuto:true},
-  shield_mh:      {name:'Shield',         hands:1, autoType:'melee',   autoRange:50,  cooldown:1.5, slashType:'sword',     slashColor:'#6090c0', dmgMult:0.5, stat:'CON'},
+  // 1-hand spear: shorter shaft, pairs with offhand
+  spear_1h:       {name:'Shortspear',     hands:1, autoType:'melee',   autoRange:75,  cooldown:1.05,slashType:'sword',     slashColor:'#90c8e8', dmgMult:0.9, stat:'STR'},
+  // Main-hand shield: blocks + bashes
+  shield_mh:      {name:'War Shield',     hands:1, autoType:'melee',   autoRange:52,  cooldown:1.5, slashType:'sword',     slashColor:'#6090c0', dmgMult:0.55,stat:'CON'},
   // Two-handed (offhand locked)
   staff:          {name:'Staff',          hands:2, autoType:'bolt',    autoRange:220, cooldown:1.2, slashType:'fire_puff', slashColor:'#4080ff', dmgMult:1.3, stat:'INT'},
-  hammer:         {name:'Hammer',         hands:2, autoType:'melee',   autoRange:60,  cooldown:1.4, slashType:'sword',     slashColor:'#e08020', dmgMult:1.5, stat:'STR'},
-  // OLD spear variant — preserved for future use, NOT in drop pool
+  hammer:         {name:'Hammer',         hands:2, autoType:'melee',   autoRange:62,  cooldown:1.4, slashType:'sword',     slashColor:'#e08020', dmgMult:1.5, stat:'STR'},
+  // Old short spear (legacy)
   spear_old:      {name:'Spear',          hands:2, autoType:'melee',   autoRange:95,  cooldown:1.1, slashType:'sword',     slashColor:'#80c0e0', dmgMult:1.0, stat:'STR', _legacy:true},
-  // NEW spear — Spartan leaf blade, thrust animation
-  spear:          {name:'Spear',          hands:2, autoType:'melee',   autoRange:95,  cooldown:1.1, slashType:'sword',     slashColor:'#80c0e0', dmgMult:1.0, stat:'STR'},
+  // 2-hand pike: very long reach
+  spear:          {name:'Pike',           hands:2, autoType:'melee',   autoRange:120, cooldown:1.2, slashType:'sword',     slashColor:'#80c0e0', dmgMult:1.1, stat:'STR'},
   scythe:         {name:'Scythe',         hands:2, autoType:'aoe_melee',autoRange:75, cooldown:1.4, slashType:'scythe',    slashColor:'#d0b030', dmgMult:1.1, stat:'STR', aoe:true},
   shortbow:       {name:'Shortbow',       hands:2, autoType:'arrow',   autoRange:180, cooldown:0.9, slashType:'arrow_puff',slashColor:'#c8a050', dmgMult:0.8, stat:'DEX'},
   longbow:        {name:'Longbow',        hands:2, autoType:'arrow',   autoRange:300, cooldown:1.3, slashType:'arrow_puff',slashColor:'#c8a050', dmgMult:1.2, stat:'DEX'},
@@ -1372,18 +1569,20 @@ const WEAPON_NAME_PARTS = {
   wand:          ['Willow','Crystal','Ember','Storm','Arcane','Soul','Star','Void'],
   staff:         ['Bone','Oak','Iron','Flame','Frost','Storm','Ancient','Cursed','Tide','Earth'],
   hammer:        ['War','Stone','Thunder','Iron','Titan','Rune','Forge','Doom'],
-  spear:         ['Iron','Silver','Dragon','Spartan','War','Holy','Storm','Ancient'],
+  spear:         ['Iron','Dragon','Spartan','War','Holy','Storm','Ancient','Lance'],
+  spear_1h:      ['Iron','Short','Swift','Hunter','Legionnaire','Phalanx','Guard','Light'],
+  shield_mh:     ['Iron','Tower','Kite','Heater','Round','Buckler','Great','Knight'],
   scythe:        ['Death','Soul','Shadow','Reaper','Cursed','Divine','Blood','Night'],
   shortbow:      ['Hunter','Swift','Elven','Shadow','Wind','Forest','Scout','Quick'],
   longbow:       ['War','Dragon','Silver','Ancient','Storm','Eagle','Ranger','Elven'],
 };
 
 const WEAPON_POOL_ALL = [
-  {type:'sword',  weight:18},{type:'axe',    weight:12},{type:'dagger', weight:14},
+  {type:'sword',    weight:18},{type:'axe',     weight:12},{type:'dagger',   weight:14},
   {type:'offhand_dagger',weight:8},
-  {type:'wand',   weight:10},{type:'staff',  weight:10},{type:'hammer', weight:8},
-  {type:'spear',  weight:8}, {type:'scythe', weight:6}, {type:'shortbow',weight:8},
-  {type:'longbow',weight:6},
+  {type:'wand',     weight:10},{type:'staff',   weight:10},{type:'hammer',   weight:8},
+  {type:'spear',    weight:7}, {type:'spear_1h',weight:8}, {type:'shield_mh',weight:5},
+  {type:'scythe',   weight:6}, {type:'shortbow',weight:8}, {type:'longbow',  weight:6},
 ];
 
 function rollWeaponType(){
@@ -1461,14 +1660,36 @@ function drawWeaponIconTo(cx, wtype, name, sz){
     cx.fillStyle='#404040'; cx.fillRect(4,-12,8,4);
 
   } else if(wtype==='spear'||wtype==='spear_old'){
+    // Long pike — extends full diagonal
     cx.strokeStyle='#8a6820'; cx.lineWidth=2.5;
-    cx.beginPath(); cx.moveTo(-14,16); cx.lineTo(7,-7); cx.stroke();
+    cx.beginPath(); cx.moveTo(-16,18); cx.lineTo(10,-10); cx.stroke();
     cx.fillStyle='#c0c8d0'; cx.strokeStyle='#e0e8f0'; cx.lineWidth=1.5;
     cx.beginPath();
-    cx.moveTo(7,-7); cx.bezierCurveTo(2,-13,13,-15,11,-21);
-    cx.bezierCurveTo(9,-15,17,-11,7,-7); cx.closePath(); cx.fill(); cx.stroke();
+    cx.moveTo(10,-10); cx.bezierCurveTo(5,-17,16,-20,14,-26);
+    cx.bezierCurveTo(12,-20,20,-15,10,-10); cx.closePath(); cx.fill(); cx.stroke();
     cx.strokeStyle='rgba(255,255,255,0.4)'; cx.lineWidth=1;
-    cx.beginPath(); cx.moveTo(7,-7); cx.lineTo(11,-19); cx.stroke();
+    cx.beginPath(); cx.moveTo(10,-10); cx.lineTo(14,-25); cx.stroke();
+
+  } else if(wtype==='spear_1h'){
+    // Short spear — compact, one-hander feel
+    cx.strokeStyle='#8a6820'; cx.lineWidth=2.5;
+    cx.beginPath(); cx.moveTo(-8,14); cx.lineTo(9,-6); cx.stroke();
+    cx.fillStyle='#b8c4d0'; cx.strokeStyle='#d8e4f0'; cx.lineWidth=1.5;
+    cx.beginPath();
+    cx.moveTo(9,-6); cx.bezierCurveTo(5,-11,14,-14,12,-19);
+    cx.bezierCurveTo(11,-14,17,-9,9,-6); cx.closePath(); cx.fill(); cx.stroke();
+    cx.strokeStyle='rgba(255,255,255,0.35)'; cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(9,-6); cx.lineTo(12,-18); cx.stroke();
+
+  } else if(wtype==='shield_mh'){
+    // Heater-style war shield as main weapon
+    cx.fillStyle='#4060a0'; cx.strokeStyle='#6080c0'; cx.lineWidth=1.5;
+    cx.beginPath(); cx.moveTo(0,-14); cx.lineTo(12,-14); cx.lineTo(14,2); cx.lineTo(6,13); cx.lineTo(-2,13); cx.lineTo(-2,2); cx.lineTo(0,-14); cx.closePath(); cx.fill(); cx.stroke();
+    cx.strokeStyle='#c0a030'; cx.lineWidth=2;
+    cx.beginPath(); cx.moveTo(6,-14); cx.lineTo(6,10); cx.stroke();
+    cx.beginPath(); cx.moveTo(-2,0); cx.lineTo(14,0); cx.stroke();
+    cx.fillStyle='rgba(255,255,255,0.15)';
+    cx.fillRect(0,-13,5,8);
 
   } else if(wtype==='scythe'){
     cx.strokeStyle='#7a5a20'; cx.lineWidth=3;
@@ -1674,44 +1895,200 @@ function makeClassWeapon(cls,level){
 
 const ARMOR_TYPES = {chest:'Chestplate',legs:'Greaves',helm:'Helm',gloves:'Gloves',boots:'Boots'};
 const ACCESSORY_TYPES = {ring1:'Ring',ring2:'Ring',amulet:'Amulet'};
+// ──────────────────────────────────────────────────────
+// RARITY SYSTEM
+// Rarities go from Common (worst) to Legendary (best).
+// RARITY_WEIGHTS controls how often each rarity drops:
+//   [50, 30, 15, 4, 1] = 50% Common, 30% Uncommon, etc.
+//   Increase the last number to get more Legendary drops.
+// RARITY_MULT scales item stats. Legendary items are 4× as strong as Common.
+//   Change these numbers to make rarities stronger or weaker.
+// ──────────────────────────────────────────────────────
 const RARITIES = ['Common','Uncommon','Rare','Epic','Legendary'];
-const RARITY_WEIGHTS = [50,30,15,4,1];
+const RARITY_WEIGHTS = [50,30,15,4,1]; // ← CHANGE THESE to adjust drop rates
 const RARITY_COLORS = {Common:'#888',Uncommon:'#40a040',Rare:'#4080c0',Epic:'#a040c0',Legendary:'#c09020'};
-const RARITY_MULT = {Common:1,Uncommon:1.3,Rare:1.8,Epic:2.5,Legendary:4.0};
+const RARITY_MULT = {Common:1,Uncommon:1.3,Rare:1.8,Epic:2.5,Legendary:4.0}; // ← stat multipliers per rarity
 
-const ZONES = [
-  {id:0,name:'ASHFIELDS',subname:'The Plains of Ash',minLv:1,maxLv:5,enemyCount:8,bossChance:0,color:'#304020',bg:'#1a1a10',groundColor:'#2a2010',enemies:['goblin','skeleton'],music:'plains'},
-  {id:1,name:'THORNWOOD',subname:'The Cursed Forest',minLv:6,maxLv:10,enemyCount:10,bossChance:0.2,color:'#203020',bg:'#0f1510',groundColor:'#1a2515',enemies:['wolf','troll'],music:'forest'},
-  {id:2,name:'ASHKEEP',subname:'Dungeon of Ash',minLv:11,maxLv:15,enemyCount:12,bossChance:0.5,color:'#201520',bg:'#0f0f18',groundColor:'#181018',enemies:['shadow','lich'],music:'dungeon',isDungeon:true},
-  {id:3,name:'AETHERHAVEN',subname:'The Wandering Town',minLv:1,maxLv:99,enemyCount:0,bossChance:0,color:'#302040',bg:'#0c0a14',enemies:[],isShop:true,
-   shopNPC:{x:1200,y:1100,name:'Mira',title:'Wandering Merchant',icon:'🧝‍♀️', mode:'general'},
-   shopNPCs:[
-     {x:1200,y:1100,name:'Mira',    title:'Wandering Merchant',icon:'🧝‍♀️', mode:'general'},
-     {x:800, y:1100,name:'Gareth',  title:'Weaponsmith',       icon:'⚒️',    mode:'weapons'},
-     {x:1600,y:1100,name:'Evelara', title:'Grand Emporium',    icon:'🧙‍♀️',  mode:'all'},
-   ],
-   shrine:{x:1200,y:800, hpRegen:20, enRegen:20, radius:70},
-  },
-];
+// ──────────────────────────────────────────────────────
+// ENEMY DEFINITIONS
+// Each key is an enemy type ID used in ZONES.enemies[].
+// Fields:
+//   name       — shown above the enemy and in the stats panel
+//   icon       — emoji (used in the stats panel, not drawn on canvas)
+//   hp         — base hit points at zone level 1
+//   atk        — base attack damage before zone scaling
+//   def        — damage reduction (subtracted before player takes damage)
+//   speed      — movement speed multiplier (1.0 = normal, 1.5 = fast)
+//                NOTE: all enemy speeds are multiplied by 0.82 in code
+//                so a speed of 1.0 actually moves at 0.82 world-speed
+//   xp         — XP given to player on kill
+//   gold       — [min, max] gold dropped on kill
+//   color      — body/skin color drawn on canvas (hex)
+//   armorColor — armor plate color (humanoid_armored only)
+//   size       — radius in pixels (affects hitbox and drawing scale)
+//   range      — attack range in pixels (melee ~40-70, ranged ~200+)
+//   level      — minimum player level before this enemy is dangerous
+//   archetype  — determines how it's drawn:
+//                'humanoid_bare'    = unarmored human body
+//                'humanoid_armored' = armored human with helmet
+//                'undead'           = semi-transparent ghostly form
+//   weaponType — weapon it holds (uses same IDs as WEAPON_DEFS)
+//   ranged     — true = fires projectiles instead of melee swings
+//   isBoss     — true = gets crown icon, glow, 100% loot drop
+//   lootChance — 0.0-1.0 base chance to drop an item (before luck)
+// ──────────────────────────────────────────────────────
+// GOLD DROP TABLES (by zone tier)
+// Mob gold: base 5% drop rate + 1% per LCK point, smooth curve toward max
+// Boss gold: always drops, much higher range
+// Tier 0=lv1-5 | Tier 1=lv6-10 | Tier 2=lv11-15 | Tier 3=lv16-20 | Tier 4=lv20+
+// ──────────────────────────────────────────────────────
+const GOLD_TABLE = {
+  mob:  [ [1,2],[2,5],[3,8],[5,12],[7,14] ],
+  boss: [ [10,40],[20,70],[30,120],[20,200],[50,500] ],
+};
+// rollGold(tier, isBoss, luck) — LCK smooth-curves the roll toward the max end
+function rollGold(tier, isBoss, luck){
+  const table = isBoss ? GOLD_TABLE.boss : GOLD_TABLE.mob;
+  const t = Math.min(tier, table.length-1);
+  const [gMin, gMax] = table[t];
+  if(!isBoss){
+    const dropChance = 0.05 + (luck||0)*0.01; // base 5% + 1% per LCK
+    if(Math.random() > dropChance) return 0;
+  }
+  const bias = 1 + (luck||0)*0.18; // LCK curve strength — change 0.18 to tune
+  const t2 = Math.pow(Math.random(), 1/bias);
+  return Math.round(gMin + t2*(gMax-gMin));
+}
 
 const ENEMY_DEFS = {
-  goblin:{name:'Goblin',icon:'👺',hp:30,atk:5,def:1,speed:1.2,xp:8,gold:[5,15],color:'#408030',size:18,range:40,level:1},
-  skeleton:{name:'Skeleton',icon:'💀',hp:40,atk:7,def:2,speed:1.0,xp:12,gold:[8,20],color:'#a0a070',size:20,range:44,level:2},
-  wolf:{name:'Wolf',icon:'🐺',hp:55,atk:10,def:3,speed:1.5,xp:18,gold:[12,28],color:'#706050',size:22,range:48,level:6},
-  troll:{name:'Troll',icon:'👹',hp:90,atk:14,def:5,speed:0.7,xp:28,gold:[18,40],color:'#407040',size:30,range:58,level:7,isBoss:false},
-  shadow:{name:'Shadow Wraith',icon:'👻',hp:70,atk:16,def:4,speed:1.3,xp:35,gold:[22,55],color:'#604080',size:24,range:50,level:11},
-  lich:{name:'Lich Lord',icon:'🧟',hp:200,atk:22,def:8,speed:0.8,xp:80,gold:[80,160],color:'#8040a0',size:36,range:68,level:12,isBoss:true},
+  // ── ZONE 0 — ASHFIELDS (Lv 1-5, tier 0) ──────────────────────────────
+  goblin:          {name:'Goblin Cutpurse', icon:'👺', hp:28, atk:5, def:0,speed:1.55,xp:8, tier:0,color:'#408030',size:17,range:42, level:1, archetype:'humanoid_bare',   weaponType:'dagger',  lootChance:0.28},
+  bandit:          {name:'Bandit',          icon:'🧑', hp:45, atk:8, def:1,speed:1.4, xp:13,tier:0,color:'#7a5530',size:19,range:46, level:3, archetype:'humanoid_bare',   weaponType:'sword',   lootChance:0.33},
+  bandit_axe:      {name:'Bandit Reaver',   icon:'🧔', hp:50, atk:10,def:1,speed:1.3, xp:15,tier:0,color:'#6a4a28',size:19,range:46, level:4, archetype:'humanoid_bare',   weaponType:'axe',     lootChance:0.35},
+  deserter:        {name:'Deserter',        icon:'🧑', hp:55, atk:9, def:2,speed:1.3, xp:16,tier:0,color:'#806040',size:20,range:52, level:4, archetype:'humanoid_armored',weaponType:'spear_1h',lootChance:0.35,armorColor:'#605040'},
+  skeleton:        {name:'Skeleton',        icon:'💀', hp:38, atk:7, def:2,speed:1.2, xp:12,tier:0,color:'#a0a070',size:20,range:44, level:2, archetype:'humanoid_armored',weaponType:'sword',   lootChance:0.38,armorColor:'#707060'},
+  skeleton_arch:   {name:'Skeleton Archer', icon:'💀', hp:32, atk:9, def:1,speed:1.3, xp:14,tier:0,color:'#a0a070',size:19,range:200,level:3, archetype:'humanoid_armored',weaponType:'shortbow',lootChance:0.38,armorColor:'#707060',ranged:true},
+  // ── ZONE 1 — THORNWOOD (Lv 6-10, tier 1) ─────────────────────────────
+  orc_guard:       {name:'Orc Guard',       icon:'🧟', hp:85, atk:13,def:4,speed:1.1, xp:25,tier:1,color:'#2a5a20',size:22,range:50, level:6, archetype:'humanoid_armored',weaponType:'axe',     lootChance:0.45,armorColor:'#405a30'},
+  orc_shaman:      {name:'Orc Shaman',      icon:'🧙', hp:60, atk:14,def:2,speed:1.2, xp:28,tier:1,color:'#3a6a10',size:21,range:190,level:7, archetype:'humanoid_bare',   weaponType:'wand',    lootChance:0.45,ranged:true},
+  troll:           {name:'Troll Brute',     icon:'👹', hp:95, atk:16,def:5,speed:0.85,xp:30,tier:1,color:'#407040',size:30,range:58, level:7, archetype:'humanoid_armored',weaponType:'hammer',  lootChance:0.45,armorColor:'#305030'},
+  spearman:        {name:'Thornwood Lancer',icon:'🧔', hp:78, atk:12,def:3,speed:1.2, xp:24,tier:1,color:'#504030',size:21,range:100,level:6, archetype:'humanoid_armored',weaponType:'spear',   lootChance:0.42,armorColor:'#403528'},
+  shieldwall:      {name:'Shield Warden',   icon:'🧑', hp:110,atk:10,def:8,speed:1.0, xp:26,tier:1,color:'#405060',size:22,range:48, level:7, archetype:'humanoid_armored',weaponType:'shield_mh',lootChance:0.42,armorColor:'#304050'},
+  scoundrel:       {name:'Forest Scoundrel',icon:'🧝', hp:70, atk:14,def:2,speed:1.6, xp:22,tier:1,color:'#304a20',size:20,range:42, level:6, archetype:'humanoid_bare',   weaponType:'dagger',  lootChance:0.4},
+  // ── ZONE 2 — ASHKEEP (Lv 11-15, tier 2) ──────────────────────────────
+  dark_knight:     {name:'Dark Knight',     icon:'🗡️',hp:135,atk:20,def:8, speed:1.05,xp:46,tier:2,color:'#303050',size:24,range:58, level:10,archetype:'humanoid_armored',weaponType:'sword',   lootChance:0.55,armorColor:'#20203a'},
+  death_archer:    {name:'Death Archer',    icon:'💀', hp:80, atk:22,def:4,speed:1.25,xp:40,tier:2,color:'#503050',size:21,range:260,level:11,archetype:'humanoid_armored',weaponType:'longbow', lootChance:0.5, armorColor:'#302030',ranged:true},
+  dread_lancer:    {name:'Dread Lancer',    icon:'🧟', hp:120,atk:18,def:6,speed:1.1, xp:44,tier:2,color:'#283038',size:23,range:105,level:11,archetype:'humanoid_armored',weaponType:'spear',   lootChance:0.52,armorColor:'#1e2830'},
+  cultist_mage:    {name:'Void Cultist',    icon:'🧙', hp:90, atk:24,def:3,speed:1.2, xp:48,tier:2,color:'#4a1060',size:21,range:200,level:12,archetype:'humanoid_bare',   weaponType:'staff',   lootChance:0.5, ranged:true},
+  shadow:          {name:'Shadow Wraith',   icon:'👻', hp:75, atk:18,def:4,speed:1.55,xp:36,tier:2,color:'#604080',size:24,range:50, level:11,archetype:'undead',          lootChance:0.4, ranged:true},
+  lich:            {name:'Lich Lord',       icon:'🧟', hp:220,atk:24,def:9,speed:0.95,xp:85,tier:2,color:'#8040a0',size:36,range:68, level:12,archetype:'undead',          lootChance:1.0, isBoss:true,weaponType:'staff'},
+  // ── ZONE 3 — IRON WASTES (Lv 16-20, tier 3) ──────────────────────────
+  iron_juggernaut: {name:'Iron Juggernaut', icon:'⚙️', hp:280,atk:30,def:14,speed:0.9, xp:90, tier:3,color:'#505060',size:28,range:60, level:16,archetype:'humanoid_armored',weaponType:'hammer', lootChance:0.6, armorColor:'#383840'},
+  voidblade:       {name:'Void Blade',      icon:'🗡️',hp:200,atk:36,def:8, speed:1.35,xp:100,tier:3,color:'#200030',size:23,range:60, level:17,archetype:'humanoid_armored',weaponType:'sword',  lootChance:0.6, armorColor:'#180020'},
+  wraith_knight:   {name:'Wraith Knight',   icon:'👻', hp:170,atk:32,def:6, speed:1.4, xp:95, tier:3,color:'#304060',size:24,range:260,level:17,archetype:'undead',          lootChance:0.55,ranged:true},
+  storm_archer:    {name:'Storm Archer',    icon:'💀', hp:160,atk:38,def:5, speed:1.45,xp:95, tier:3,color:'#204050',size:22,range:280,level:18,archetype:'humanoid_armored',weaponType:'longbow',lootChance:0.55,armorColor:'#182838',ranged:true},
+  rift_mage:       {name:'Rift Mage',       icon:'🧙', hp:180,atk:42,def:4, speed:1.2, xp:110,tier:3,color:'#300050',size:22,range:210,level:18,archetype:'humanoid_bare',   weaponType:'staff',  lootChance:0.6, ranged:true},
+  iron_colossus:   {name:'Iron Colossus',   icon:'🤖', hp:500,atk:40,def:18,speed:0.75,xp:200,tier:3,color:'#404858',size:40,range:72, level:20,archetype:'humanoid_armored',weaponType:'hammer', lootChance:1.0, isBoss:true,armorColor:'#303038'},
+  // ── ZONE 4 — ABYSSAL FORGE (Lv 20+, tier 4) ──────────────────────────
+  abyssal_guard:   {name:'Abyssal Guard',   icon:'😈', hp:380,atk:48,def:16,speed:1.05,xp:150,tier:4,color:'#200020',size:26,range:62, level:20,archetype:'humanoid_armored',weaponType:'axe',   lootChance:0.65,armorColor:'#180018'},
+  soul_reaper:     {name:'Soul Reaper',     icon:'💀', hp:300,atk:55,def:10,speed:1.5, xp:165,tier:4,color:'#100020',size:24,range:80, level:21,archetype:'undead',          lootChance:0.65,weaponType:'scythe'},
+  abyss_lancer:    {name:'Abyss Lancer',    icon:'🧟', hp:350,atk:50,def:12,speed:1.2, xp:160,tier:4,color:'#101828',size:25,range:115,level:21,archetype:'humanoid_armored',weaponType:'spear', lootChance:0.65,armorColor:'#0c1220'},
+  void_assassin:   {name:'Void Assassin',   icon:'🗡️',hp:260,atk:60,def:7, speed:1.75,xp:170,tier:4,color:'#100018',size:21,range:48, level:22,archetype:'humanoid_bare',   weaponType:'dagger',lootChance:0.65},
+  abyssal_caster:  {name:'Abyssal Caster',  icon:'🔮', hp:280,atk:65,def:6, speed:1.3, xp:180,tier:4,color:'#080018',size:23,range:240,level:22,archetype:'humanoid_bare',   weaponType:'staff', lootChance:0.7, ranged:true},
+  void_lord:       {name:'Void Lord',       icon:'😈', hp:900,atk:70,def:22,speed:0.88,xp:450,tier:4,color:'#300040',size:44,range:80, level:24,archetype:'undead',          lootChance:1.0, isBoss:true,weaponType:'staff'},
 };
 
+
+// ──────────────────────────────────────────────────────
+// ZONES (Areas / Maps)
+// Each zone is a location the player can travel to.
+// Fields:
+//   id          — numeric ID (used internally)
+//   name        — big label shown on screen when you enter
+//   subname     — smaller subtitle shown below the name
+//   minLv/maxLv — level range shown in zone select UI (display only)
+//   enemyCount  — how many enemies spawn at once in this zone
+//                 ← CHANGE THIS to make zones feel more/less busy
+//   bossChance  — 0.0-1.0 probability a boss spawns during a wave
+//                 0 = never, 1 = always, 0.2 = 20% chance
+//   enemies     — list of ENEMY_DEF keys that can spawn here
+//                 ← ADD/REMOVE enemy type IDs to change who appears
+//   boss        — specific boss enemy key that spawns separately
+//   color       — UI accent color for this zone (hex)
+//   bg          — canvas background color when drawing this zone (hex)
+//   groundColor — ground tile color (hex)
+//   isShop      — true = this is the town (no enemies, has vendors)
+//   isDungeon   — true = affects some visual effects only
+//
+// Town zone (AETHERHAVEN) extra fields:
+//   storageChest — {x,y} world position of the shared stash chest
+//   shrine       — {x,y,hpRegen,enRegen,radius} healing shrine
+//                  hpRegen/enRegen = HP/Energy restored per second while standing in it
+//                  radius = how close you need to stand (pixels)
+//   shopNPCs     — list of vendors with positions, names, and shop mode
+//                  x,y = world position; mode = which items they sell
+// ──────────────────────────────────────────────────────
+const ZONES = [
+  {id:0,name:'ASHFIELDS',   subname:'The Plains of Ash',     minLv:1, maxLv:5,  enemyCount:8,  bossChance:0,   color:'#304020',bg:'#1a1a10',groundColor:'#2a2010',enemies:['goblin','bandit','bandit_axe','deserter','skeleton','skeleton_arch'],music:'plains'},
+  {id:1,name:'THORNWOOD',   subname:'The Cursed Forest',     minLv:6, maxLv:10, enemyCount:10, bossChance:0.2, color:'#203020',bg:'#0f1510',groundColor:'#1a2515',enemies:['orc_guard','orc_shaman','troll','spearman','shieldwall','scoundrel'],music:'forest'},
+  {id:2,name:'ASHKEEP',     subname:'Dungeon of Ash',        minLv:11,maxLv:15, enemyCount:10, bossChance:0,   color:'#201520',bg:'#0f0f18',groundColor:'#181018',enemies:['dark_knight','death_archer','dread_lancer','cultist_mage','shadow'],boss:'lich',music:'dungeon',isDungeon:true},
+  {id:3,name:'AETHERHAVEN', subname:'The Wandering Town',    minLv:1, maxLv:99, enemyCount:0,  bossChance:0,   color:'#302040',bg:'#0c0a14',enemies:[],isShop:true,
+   storageChest:{x:840, y:580},
+   shrine:{x:1200, y:1060, hpRegen:20, enRegen:20, radius:70},
+   shopNPC:{x:1200,y:1280,name:'Mira',title:'General Store',icon:'🧝‍♀️', mode:'general'},
+   shopNPCs:[
+     // ── ROW: MELEE WEAPONS  (y=820, spread left of shrine) ──────────
+     {x:840,  y:820,  name:'Aldric',  title:'Swords & Axes',    icon:'⚔️',  mode:'blades'},
+     {x:960,  y:820,  name:'Brak',    title:'Daggers',          icon:'🗡️',  mode:'daggers'},
+     {x:1080, y:820,  name:'Veskar',  title:'Scythes',          icon:'☠️',  mode:'scythes'},
+     // ── ROW: POLEARMS + RANGED  (y=820, right of shrine) ───────────
+     {x:1320, y:820,  name:'Torla',   title:'Spears & Pikes',   icon:'🏹',  mode:'polearms'},
+     {x:1440, y:820,  name:'Fenwick', title:'Bows',             icon:'🎯',  mode:'bows'},
+     {x:1560, y:820,  name:'Zivra',   title:'Wands & Staves',   icon:'🔮',  mode:'staves'},
+     // ── ROW: DEFENSE & OFFHAND  (y=1060, left of shrine) ───────────
+     {x:840,  y:1060, name:'Durrak',  title:'War Shields (MH)', icon:'🛡️',  mode:'shields_mh'},
+     {x:960,  y:1060, name:'Gorra',   title:'Offhand Shields',  icon:'🔰',  mode:'shields_oh'},
+     {x:1080, y:1060, name:'Serath',  title:'Other Offhand',    icon:'🔯',  mode:'offhand'},
+     // ── ROW: ARMOR  (y=1060, right of shrine) ───────────────────────
+     {x:1320, y:1060, name:'Borvak',  title:'Plate & Mail',     icon:'⛏️',  mode:'heavy_armor'},
+     {x:1440, y:1060, name:'Sennah',  title:'Leather & Hide',   icon:'🧥',  mode:'light_armor'},
+     // ── ROW: ACCESSORIES + GENERAL  (south) ─────────────────────────
+     {x:1080, y:1280, name:'Orela',   title:'Rings & Amulets',  icon:'💍',  mode:'accessories'},
+     {x:1200, y:1280, name:'Mira',    title:'General Store',    icon:'🧝‍♀️', mode:'general'},
+   ],
+  },
+  // Zone index 4: accessed via portals added to town (Iron Wastes — lv 16-20)
+  {id:4,name:'IRON WASTES', subname:'The Shattered Steppes',minLv:16,maxLv:20, enemyCount:12, bossChance:0,   color:'#303040',bg:'#101018',groundColor:'#181820',enemies:['iron_juggernaut','voidblade','wraith_knight','storm_archer','rift_mage'],boss:'iron_colossus',music:'dungeon',isDungeon:true},
+  // Zone index 5: for prestige-level players (Abyssal Forge — lv 20+)
+  {id:5,name:'ABYSSAL FORGE',subname:'The Endless Descent', minLv:20,maxLv:99, enemyCount:14, bossChance:0,   color:'#200028',bg:'#080010',groundColor:'#100018',enemies:['abyssal_guard','soul_reaper','abyss_lancer','void_assassin','abyssal_caster'],boss:'void_lord',music:'dungeon',isDungeon:true},
+];
+
 // ======================================================
-// GAME STATE
+// GAME STATE — The G Object
+// G is the single global object that holds ALL live game data.
+// It gets populated when startGame() is called.
+// Key properties you might care about in the console:
+//   G.player          — the current player character object
+//   G.player.level    — current player level (1-20)
+//   G.player.xp       — current XP toward next level
+//   G.player.gold     — current gold amount
+//   G.player.hp       — current hit points
+//   G.player.equipment — equipped items (weapon, offhand, chest, etc.)
+//   G.player.inventory — array of items in the bag (max 40)
+//   G.enemies         — array of all live enemies in the zone
+//   G.corpses         — array of grave crosses shown after kills
+//   G.groundItems     — array of gold coins and loot on the ground
+//   G.projectiles     — array of arrows/bolts currently in flight
+//   G.zone            — current zone index (0=Ashfields, 3=Town)
+//   G.paused          — true when menus are open
+//   G.targetedEnemy   — the enemy currently shown in the stats panel
 // ======================================================
 let G = {};
-let animId = null;
-let canvas, ctx;
-// Input state
+let animId = null; // stores the requestAnimationFrame ID so we can cancel it
+let canvas, ctx;   // the HTML5 canvas element and its 2D drawing context
+// Input state — tracks which keyboard keys are held down
 let keys = {};
-let joystick = {active:false,dx:0,dy:0,startX:0,startY:0,id:null};
+let joystick = {active:false,dx:0,dy:0,startX:0,startY:0,id:null}; // virtual joystick state
 
 // ======================================================
 // HELPERS
@@ -1833,6 +2210,12 @@ function itemSellValue(item){
   return Math.round(base[item.rarity]*Math.max(1,item.level*0.5));
 }
 
+// ──────────────────────────────────────────────────────
+// STAT FORMULAS — these calculate your actual stats at runtime
+// ──────────────────────────────────────────────────────
+
+// getAttrBonus(attr) — bonus from equipped items and active buffs
+// Returns the total bonus to a stat from all gear + temporary buffs
 function getAttrBonus(attr){
   let bonus=0;
   if(!G.player) return 0;
@@ -1843,43 +2226,63 @@ function getAttrBonus(attr){
   return bonus;
 }
 
+// getAttr(attr) — final value of any stat (base + level bonus + points spent + gear)
+// Formula: base class stat + (level-1)×0.5 + points you spent + gear bonuses
+// ← Change 0.5 to give more stat per level (e.g. 1.0 = 1 per level)
 function getAttr(attr){
   if(!G.player) return 0;
   const cls=CLASSES[G.player.cls];
   let base=cls.baseStats[attr]||0;
-  const lvBonus=Math.floor((G.player.level-1)*0.5);
+  const lvBonus=Math.floor((G.player.level-1)*0.5); // ← stat gain per level (0.5 per level)
   const allocated=(G.player.allocatedAttrs&&G.player.allocatedAttrs[attr])||0;
   return base+lvBonus+allocated+getAttrBonus(attr);
 }
 
+// getMaxHP() — total max hit points
+// Formula: class base HP + (CON × 8) + (level-1 × 10) + HP from gear
+// ← Change ×8 to scale CON more/less (e.g. ×12 = CON gives more HP)
+// ← Change ×10 to give more/less HP per level
 function getMaxHP(){
   if(!G.player) return 100;
   const cls=CLASSES[G.player.cls];
-  const base=cls.hpBase+getAttr('CON')*8+(G.player.level-1)*10;
+  const base=cls.hpBase         // base HP from the class definition above
+    + getAttr('CON')*8          // ← each CON point = 8 HP (change this)
+    + (G.player.level-1)*10;    // ← each level = 10 HP (change this)
   let bonus=0;
   Object.values(G.player.equipment).forEach(item=>{if(item&&item.stats&&item.stats.hp)bonus+=item.stats.hp;});
   return base+bonus;
 }
 
+// getMaxEnergy() — total max energy (used to cast skills)
+// Formula: class base energy + (WIS × 3)
+// ← Change ×3 to make WIS scale energy more/less
 function getMaxEnergy(){
   if(!G.player) return 50;
   const cls=CLASSES[G.player.cls];
-  return cls.energyBase+getAttr('WIS')*3;
+  return cls.energyBase          // base energy from class definition
+    + getAttr('WIS')*3;          // ← each WIS point = 3 energy (change this)
 }
 
+// getAttackDmg() — physical auto-attack damage
+// Formula: 5 + (STR × 1.5) + (DEX × 0.5) + weapon bonus + offhand bonus
+// ← Change the multipliers to make STR/DEX more or less powerful
 function getAttackDmg(){
   if(!G.player) return 1;
   const wpn=G.player.equipment&&G.player.equipment.weapon;
   if(!wpn||!wpn.weaponType){
-    return Math.max(1, Math.round(1 + getAttr('STR')*0.1));
+    return Math.max(1, Math.round(1 + getAttr('STR')*0.1)); // bare fists formula
   }
-  let base=5+getAttr('STR')*1.5+getAttr('DEX')*0.5;
-  if(wpn&&wpn.stats) base+=(wpn.stats.dmg||0);
+  let base=5
+    + getAttr('STR')*1.5   // ← STR contribution to damage (change 1.5)
+    + getAttr('DEX')*0.5;  // ← DEX contribution to damage (change 0.5)
+  if(wpn&&wpn.stats) base+=(wpn.stats.dmg||0);       // weapon's own damage stat
   const oh=G.player.equipment&&G.player.equipment.offhand;
   if(oh&&oh.weaponType==='offhand_dagger'&&oh.stats) base+=(oh.stats.dmg||0);
   return Math.max(1,Math.round(base));
 }
 
+// getArmor() — total armor (damage reduction)
+// Armor is flat damage subtraction: 10 armor = enemy hits deal 10 less damage
 function getArmor(){
   if(!G.player) return 0;
   let armor=0;
@@ -1887,6 +2290,7 @@ function getArmor(){
   return armor;
 }
 
+// getTotalItemStat(stat) — sum of any stat across all equipped items
 function getTotalItemStat(stat){
   if(!G.player) return 0;
   let total=0;
@@ -1894,15 +2298,23 @@ function getTotalItemStat(stat){
   return total;
 }
 
+// calcSkillDmg(skill) — damage a skill will deal when activated
+// Formula: skill.dmgBase + (attr × scale) + (level-1 × 2)
+// ← Change ×2 at the end to give more/less damage per level to ALL skills
 function calcSkillDmg(skill){
   if(!G.player||!skill.dmgBase) return 0;
   const attr=getAttr(skill.attr||'STR');
-  return Math.round((skill.dmgBase+attr*(skill.scale||1))+(G.player.level-1)*2);
+  return Math.round(
+    (skill.dmgBase + attr*(skill.scale||1)) // base + scaled stat
+    + (G.player.level-1)*2                  // ← bonus damage per level (change 2)
+  );
 }
 
+// mitigateDmg(raw, armor) — applies armor to incoming damage
+// 1 point of armor = 1 less damage. Minimum 1 damage always gets through.
+// ← Change the formula here if you want percentage-based armor instead
 function mitigateDmg(raw, armor){
-  // 1 armor = 1 flat damage reduction, minimum 1 damage always dealt
-  return Math.max(1, raw - armor);
+  return Math.max(1, raw - armor); // ← flat reduction (change to percentage if desired)
 }
 
 // ======================================================
@@ -1940,68 +2352,78 @@ function initClassSelect(){
 // ======================================================
 // GAME INIT
 // ======================================================
+// ======================================================
+// START GAME — called when player picks a class and begins
+// This sets up the entire initial game state.
+// ← Good place to give yourself starting gold or items for testing
+// ======================================================
 function startGame(){
   if(!G.selectedClass) return;
   if(animId){cancelAnimationFrame(animId);animId=null;}
   
   const cls=CLASSES[G.selectedClass];
-  const initHP=cls.hpBase+cls.baseStats.CON*8;
-  const initEN=cls.energyBase+cls.baseStats.WIS*3;
+  const initHP=cls.hpBase+cls.baseStats.CON*8;  // starting HP (same formula as getMaxHP)
+  const initEN=cls.energyBase+cls.baseStats.WIS*3; // starting energy
   G.player={
     cls:G.selectedClass,
-    x:400, y:300,
+    x:400, y:300,           // starting world position (canvas center)
     hp:initHP, energy:initEN,
-    level:1, xp:0, xpNext:100,
-    gold:0,
+    level:1,                // ← starting level (change to e.g. 10 for testing)
+    xp:0,                   // current XP progress
+    xpNext:300,             // ← XP needed to reach level 2 (300 by default)
+                            //   subsequent levels multiply by 1.4 each time
+    gold:0,                 // ← starting gold (change to e.g. 9999 for testing)
     equipment:{weapon:null,offhand:null,chest:null,legs:null,helm:null,gloves:null,boots:null,ring1:null,ring2:null,amulet:null},
-    inventory:[],
-    equippedSkills:[],
-    learnedSkills:[],
-    cooldowns:{},
-    activeBuffs:[],
-    shield:0,
-    attackTimer:0,
-    attackCooldown: G.selectedClass==='dervish'?1.4:1.0,
-    vx:0, vy:0,
-    facing:1,
+    inventory:[],           // items in bag (max 40 — change in updateGroundItems)
+    equippedSkills:[],      // array of 8 skill IDs (or null for empty slots)
+    learnedSkills:[],       // all skills the player has bought/owns
+    cooldowns:{},           // {skillId: remainingSeconds} for each skill on cooldown
+    activeBuffs:[],         // [{stats, duration}] temporary stat boosts
+    shield:0,               // current damage-absorbing shield HP (from skills like Fortify)
+    attackTimer:0,          // countdown to next auto-attack
+    attackCooldown: G.selectedClass==='dervish'?1.4:1.0, // ← auto-attack speed in seconds
+    vx:0, vy:0,             // current velocity (used for smooth movement)
+    facing:1,               // 1 = facing right, -1 = facing left (flips the sprite)
     isDead:false,
-    attackAnim:0,
-    attrPoints:0,
-    allocatedAttrs:{STR:0,DEX:0,CON:0,INT:0,WIS:0,SPD:0,LCK:0},
+    attackAnim:0,           // 0-1 value driving the weapon swing animation
+    attrPoints:0,           // unspent attribute points (earned on level up)
+    allocatedAttrs:{STR:0,DEX:0,CON:0,INT:0,WIS:0,SPD:0,LCK:0}, // points spent per stat
   };
   
   // Give class-specific starter weapon
   const startWpn=makeClassWeapon(G.selectedClass,1);
   G.player.equipment.weapon=startWpn;
   
-  // Fill 8 skill slots randomly from the pool (all skills learned)
+  // Fill 8 skill slots randomly from the pool (all skills learned at start)
   const skillPool=CLASS_SKILL_POOLS[G.selectedClass]||cls.startSkills;
   G.player.learnedSkills=[...skillPool];
   const shuffledPool=[...skillPool].sort(()=>Math.random()-0.5);
-  G.player.equippedSkills=shuffledPool.slice(0,8);
-  // All skills start fully recharged
+  G.player.equippedSkills=shuffledPool.slice(0,8); // take first 8 from shuffled list
   G.player.cooldowns={};
   
   G.player.hp=getMaxHP();
   G.player.energy=getMaxEnergy();
   
-  G.zone=0;
+  G.zone=0;             // start in Ashfields (zone 0)
   G.enemies=[];
+  G.corpses=[];
+  G.targetedEnemy=null;
   G.projectiles=[];
   G.particles=[];
   G.slashEffects=[];
   G.groundItems=[];
-  G.autoAttack=true;
+  G.autoAttack=true;    // auto-attack starts ON
   G.paused=false;
-  G.speedCap=8;
-  G.showRanges=true;
-  G.showHPBars=true;
-  G.zoom=1.0;
+  G.speedCap=8;         // not currently used (visual particle speed cap)
+  G.showRanges=true;    // show attack range circles around player (toggle in debug)
+  G.showHPBars=true;    // show HP bars above enemies
+  G.zoom=1.0;           // camera zoom level (1.0 = normal, 2.0 = zoomed in)
   G.lastTime=0;
-  G.energyRegen=2;
+  G.energyRegen=2;      // ← energy regenerated per second while out of combat
+                        //   Change this to give more/less energy regen baseline
   G.spawnTimer=0;
-  G.spawnInterval=1.5;
-  G.maxEnemies=20;
+  G.spawnInterval=1.5;  // ← seconds between enemy spawns (lower = faster spawning)
+  G.maxEnemies=20;      // ← max enemies on screen at once (increase for harder zones)
   // Camera: player is always at screen center
   G.cam={x:G.player.x, y:G.player.y};
   G.worldSize=2400;
@@ -2020,6 +2442,7 @@ function startGame(){
   document.querySelectorAll('.drawer-overlay').forEach(d=>d.classList.remove('open'));
   initCanvas();
   buildSkillBar();
+  setupEnemyTargeting();
   setTimeout(initMinimapDrag,100);
   setTimeout(initAllHUDDrags, 200);
   spawnInitialEnemies();
@@ -2108,13 +2531,12 @@ function setupInput(){
     }
   });
 
-  // Canvas tap: open shop if near NPC
+  // Canvas tap: open shop if near NPC, open chest if near stash
   canvas.addEventListener('click',e=>{
     if(!G.player||G.shopOpen) return;
     const zone=ZONES[G.zone];
-    if(zone.isShop && zone.shopNPC && G.shopNearby){
-      openShop();
-    }
+    if(zone.isShop && G.chestNearby){ openChest(); return; }
+    if(zone.isShop && G.shopNearby){ openShop(G.activeNPC); }
   });
 }
 
@@ -2146,6 +2568,11 @@ function gameLoop(ts){
   animId=requestAnimationFrame(gameLoop);
 }
 
+// ======================================================
+// MAIN UPDATE LOOP
+// Called every frame. dt = delta time in seconds (typically ~0.016 for 60fps).
+// This is the heart of the game — it updates everything before drawing.
+// ======================================================
 function update(dt){
   updatePlayer(dt);
   updateEnemies(dt);
@@ -2153,12 +2580,14 @@ function update(dt){
   updateParticles(dt);
   updateSlashEffects(dt);
   updateGroundItems(dt);
+  updateCorpses(dt);
   updateBuffs(dt);
   updateSpawn(dt);
   updateAllies(dt);
   updatePortals(dt);
   updateEnergy(dt);
   checkBoss();
+  updateEnemyStatsPanel();
   updateHUD();
 }
 
@@ -2221,12 +2650,17 @@ function drawAllies(){
 }
 
 // ======================================================
-// PLAYER UPDATE
+// PLAYER UPDATE — runs every frame while game is active
+// Handles: movement speed, auto-attack timing, stamina regen
 // ======================================================
 function updatePlayer(dt){
   const p=G.player;
-  const rawSpeed=2.5+getAttr('SPD')*0.3;
-  const maxSpeed=2.5*1.66;
+  // ── Player movement speed ────────────────────────────────────
+  // rawSpeed = base speed + SPD stat bonus
+  // Change 1.5 to make the player faster (e.g. 2.0) or slower (e.g. 1.0)
+  // Each SPD attribute point adds 0.22 to speed — change 0.22 to adjust SPD scaling
+  const rawSpeed=1.5+getAttr('SPD')*0.22;
+  const maxSpeed=1.5*1.55; // hard cap — even with huge SPD, can't exceed this
   const speed=Math.min(rawSpeed,maxSpeed);
   
   let mx=0,my=0;
@@ -2345,43 +2779,88 @@ function dealDamage(enemy,dmg,isCrit,color){
 
 function killEnemy(enemy){
   const p=G.player;
-  // XP
-  const xpGain=enemy.xpReward||10;
-  p.xp+=xpGain;
+  const luck = getAttr('LCK'); // LCK stat — used for both gold drop and item drop
+
+  // ── XP reward ────────────────────────────────────────
+  const xpGain = enemy.xpReward || enemy.xp || 10;
+  p.xp += xpGain;
   spawnXPFloat(`+${xpGain} XP`);
   checkLevelUp();
-  
-  // Gold — drop as walkover coin on ground
-  const goldAmt=rand(enemy.goldMin||1,enemy.goldMax||5);
-  spawnGoldPickup(enemy.x+rand(-25,25), enemy.y+rand(-25,25), goldAmt);
-  
-  // Loot — drop on ground (base 8% chance, modified by Luck)
-  const luck=G.player?getAttr('LCK'):0;
-  const dropChance=(enemy.lootChance||0.3)*0.08 + luck*0.008;
-  if(Math.random()<dropChance){
+
+  // ── Gold drop — uses tier table + LCK smooth curve ───
+  // Mobs have a 5%+LCK% chance to drop gold.
+  // Bosses always drop gold from the boss table.
+  const tier = enemy.tier ?? Math.min(G.zone, 4);
+  const goldAmt = rollGold(tier, enemy.isBoss||false, luck);
+  if(goldAmt > 0){
+    spawnGoldPickup(enemy.x+rand(-25,25), enemy.y+rand(-25,25), goldAmt);
+  }
+
+  // ── Item drop — base 8% × enemy lootChance + LCK bonus ─
+  const dropChance = (enemy.lootChance||0.3) * 0.08 + luck * 0.008;
+  if(Math.random() < dropChance){
     const allSlots=['weapon','offhand','chest','legs','helm','gloves','boots','ring1','ring2','amulet'];
-    // Offhand drops less frequently
-    const slot=Math.random()<0.12?'offhand':allSlots.filter(s=>s!=='offhand')[rand(0,8)];
-    const item=genItem(slot,Math.max(1,G.zone*4+rand(-1,2)),luck);
-    if(enemy.isBoss){item.rarity=RARITIES[Math.min(4,Math.max(2,RARITIES.indexOf(item.rarity)+2))];}
-    spawnGroundItem(item, enemy.x + rand(-20,20), enemy.y + rand(-20,20));
+    const slot = Math.random()<0.12 ? 'offhand' : allSlots.filter(s=>s!=='offhand')[rand(0,8)];
+    const item = genItem(slot, Math.max(1, tier*4 + rand(-1,2)), luck);
+    if(enemy.isBoss){ item.rarity=RARITIES[Math.min(4,Math.max(2,RARITIES.indexOf(item.rarity)+2))]; }
+    spawnGroundItem(item, enemy.x+rand(-20,20), enemy.y+rand(-20,20));
     HAPTIC.loot();
   }
-  
-  // Particles burst
-  spawnParticles(enemy.x,enemy.y,'#ffcc44',12);
+
+  // ── Particles ────────────────────────────────────────
+  spawnParticles(enemy.x, enemy.y, '#ffcc44', 12);
+
+  // ── Corpse (graveyard cross) ──────────────────────────
+  if(!G.corpses) G.corpses=[];
+  G.corpses.push({
+    x:enemy.x, y:enemy.y,
+    icon:enemy.icon, size:enemy.size, color:enemy.color,
+    archetype:enemy.archetype||'beast',
+    armorColor:enemy.armorColor||null,
+    name:enemy.name,
+    life:18, // ← seconds before cross fades (change this)
+    alpha:1,
+  });
+
+  if(G.targetedEnemy===enemy){ G.targetedEnemy=null; }
+  if(enemy.isBoss) G.bossDefeated=true;
   G.enemies=G.enemies.filter(e=>e!==enemy);
 }
 
+// ──────────────────────────────────────────────────────
+// LEVEL UP SYSTEM
+// checkLevelUp() is called after every XP gain.
+// XP needed to level up:
+//   Level 1→2 : 300 XP  (set in startGame as p.xpNext=300)
+//   Each level after: xpNext = previous × 1.4 (40% more each time)
+//   ← Change 1.4 below to adjust XP scaling (1.2 = easier, 1.6 = harder)
+// MAX_LEVEL = 20. After level 20, gaining an XP bar gives a Prestige Token
+//   instead of a level up. Tokens can be exchanged for legendary weapons.
+//   ← Change 20 to allow higher levels.
+// ──────────────────────────────────────────────────────
 function checkLevelUp(){
   const p=G.player;
+  const MAX_LEVEL=20; // ← maximum player level (change to allow higher levels)
   while(p.xp>=p.xpNext){
     p.xp-=p.xpNext;
+    if(p.level>=MAX_LEVEL){
+      // Post-max: heal to full + award prestige token
+      p.xp=0; // don't overflow
+      p.hp=getMaxHP();
+      p.energy=getMaxEnergy();
+      p.prestigeTokens=(p.prestigeTokens||0)+1;
+      SFX.levelUp();
+      HAPTIC.levelUp();
+      showLevelUp();
+      showToast(`⚔️ PRESTIGE TOKEN ×${p.prestigeTokens} — Healed & ready!`);
+      updateHUD();
+      break;
+    }
     p.level++;
-    p.xpNext=Math.round(p.xpNext*1.4);
-    p.hp=getMaxHP();
-    p.energy=getMaxEnergy();
-    p.attrPoints=(p.attrPoints||0)+1;
+    p.xpNext=Math.round(p.xpNext*1.4); // ← XP curve: 1.4 = 40% more XP needed per level
+    p.hp=getMaxHP();       // fully restore HP on level up
+    p.energy=getMaxEnergy(); // fully restore energy on level up
+    p.attrPoints=(p.attrPoints||0)+1; // earn 1 attribute point to spend
     SFX.levelUp();
     HAPTIC.levelUp();
     showLevelUp();
@@ -2396,11 +2875,14 @@ function spawnInitialEnemies(){
   G.enemies=[];
   const zone=ZONES[G.zone];
   if(zone.isShop){
-    // Town: no enemies, just portals back to combat zones
+    // Town: portals grouped at the southern gate (portal plaza)
+    // 5 portals: 3 on top row, 2 on bottom row
     G.portals=[
-      {x:1200,y:1400,toZone:0,label:'To Ashfields', color:'#40c060',pulseT:0},
-      {x:900, y:1100,toZone:1,label:'To Thornwood', color:'#60c040',pulseT:1},
-      {x:1500,y:1100,toZone:2,label:'To Ashkeep',  color:'#c04080',pulseT:2},
+      {x:1080,y:1580,toZone:0,label:'Ashfields',    sublabel:'Lv 1-5',  color:'#40c060',pulseT:0},
+      {x:1200,y:1560,toZone:1,label:'Thornwood',    sublabel:'Lv 6-10', color:'#60c040',pulseT:1},
+      {x:1320,y:1580,toZone:2,label:'Ashkeep',      sublabel:'Lv 11-15',color:'#c04080',pulseT:2},
+      {x:1140,y:1640,toZone:4,label:'Iron Wastes',  sublabel:'Lv 16-20',color:'#8080c0',pulseT:3},
+      {x:1260,y:1640,toZone:5,label:'Abyssal Forge',sublabel:'Lv 20+',  color:'#8020a0',pulseT:4},
     ];
     return;
   }
@@ -2411,6 +2893,26 @@ function spawnInitialEnemies(){
     {x:400, y:2000, toZone:3,label:'To Town',color:'#a040ff',pulseT:2},
   ];
   for(let i=0;i<Math.min(6,zone.enemyCount);i++) spawnEnemy();
+  // Spawn zone boss once if defined
+  if(zone.boss && ENEMY_DEFS[zone.boss]){
+    G.bossDefeated=false;
+    const def=ENEMY_DEFS[zone.boss];
+    const lvScale=1+G.zone*0.5+(G.player.level-1)*0.1;
+    const hpMax=Math.round(def.hp*lvScale);
+    G.enemies.push({
+      ...def,
+      x:G.worldSize/2+rand(-100,100), y:G.worldSize/2+rand(-100,100),
+      hpMax, hp:hpMax,
+      xpReward:Math.round(def.xp*lvScale),
+      size: Math.round(def.size * 1.1),  // ← bosses are 10% bigger
+      isBoss: true,                       // ensures gold glow + crown
+      lootChance:1.0,
+      attackTimer:2, attackCooldown:1.5+(1-def.speed)*0.5,
+      flashTimer:0, attackAnim:0,
+      dotTimer:0, dotDmg:0, dotTicks:0,
+      slowTimer:0, stunTimer:0, moveTimer:0,
+    });
+  }
 }
 
 function spawnEnemy(forceBoss=false){
@@ -2442,11 +2944,12 @@ function spawnEnemy(forceBoss=false){
     x,y,
     hpMax,hp:hpMax,
     xpReward:Math.round(def.xp*lvScale),
-    goldMin:Math.round(def.gold[0]*lvScale),goldMax:Math.round(def.gold[1]*lvScale),
+    // gold is now rolled at kill time via rollGold(enemy.tier, isBoss, luck)
     lootChance:def.isBoss?1.0:0.45,
     attackTimer:rand(0,200)/100,
     attackCooldown:1.5+(1-def.speed)*0.5,
     flashTimer:0,
+    attackAnim:0,
     dotTimer:0,
     dotDmg:0, dotTicks:0,
     slowTimer:0,
@@ -2457,11 +2960,15 @@ function spawnEnemy(forceBoss=false){
 
 function updateSpawn(dt){
   const zone=ZONES[G.zone];
-  if(!zone.isShop && G.enemies.length<G.maxEnemies){
-    G.spawnTimer+=dt;
-    if(G.spawnTimer>=G.spawnInterval){
-      G.spawnTimer=0;
-      spawnEnemy();
+  if(!zone.isShop){
+    // Count only non-boss enemies for cap
+    const regularCount=G.enemies.filter(e=>!e.isBoss).length;
+    if(regularCount<zone.enemyCount){
+      G.spawnTimer+=dt;
+      if(G.spawnTimer>=G.spawnInterval){
+        G.spawnTimer=0;
+        spawnEnemy(); // spawnEnemy never picks boss types now
+      }
     }
   }
 }
@@ -2494,6 +3001,7 @@ function updatePortals(dt){
     const npcs=zone.shopNPCs||[zone.shopNPC];
     G.shopNearby=false;
     G.activeNPC=null;
+    G.chestNearby=false;
     npcs.forEach(npc=>{
       if(!npc) return;
       if(dist(p,npc)<70 && !G.shopOpen){
@@ -2501,6 +3009,10 @@ function updatePortals(dt){
         G.activeNPC=npc;
       }
     });
+    // Storage chest proximity
+    if(zone.storageChest && dist(p,zone.storageChest)<80){
+      G.chestNearby=true;
+    }
     // Shrine regen
     if(zone.shrine){
       const shrine=zone.shrine;
@@ -2534,11 +3046,15 @@ function updateEnemies(dt){
       }
     }
     
-    // Move toward player — stop when touching (based on sprite size, not attack range)
+    // ── Enemy movement toward player ─────────────────────────────
+    // spd = enemy's speed stat × global multiplier × slow effect × frame timing
+    // The 0.82 multiplier keeps enemies slightly slower than the player (base 1.5)
+    // ← Change 0.82 to make ALL enemies faster (e.g. 1.0) or slower (e.g. 0.6)
+    // The 0.4 multiplier is applied when the enemy is slowed by a skill
     const d=dist(e,p);
-    const spd=e.speed*(e.slowTimer>0?0.4:1)*60*dt;
-    const attackRange=e.range||50;
-    const stopDist=e.size+18; // stop when visually touching player
+    const spd=e.speed*0.82*(e.slowTimer>0?0.4:1)*60*dt;
+    const attackRange=e.range||50; // how close enemy must be to start attacking
+    const stopDist=e.size+18;      // stop moving when this close (prevents overlapping)
     
     if(d>stopDist){
       const nx=(p.x-e.x)/d;
@@ -2551,9 +3067,33 @@ function updateEnemies(dt){
     e.attackTimer-=dt;
     if(e.attackTimer<=0 && d<=attackRange){
       e.attackTimer=e.attackCooldown;
+      // Attack animation
+      e.attackAnim=1.0;
       let dmg=Math.round(e.atk*(1+G.zone*0.3));
       const armor=getArmor();
       dmg=mitigateDmg(dmg,armor);
+      
+      // Ranged enemies fire projectiles
+      if(e.ranged && d>80){
+        const angle=Math.atan2(p.y-e.y,p.x-e.x);
+        G.projectiles.push({
+          x:e.x, y:e.y,
+          vx:Math.cos(angle)*280, vy:Math.sin(angle)*280,
+          dmg:Math.max(1,dmg), isCrit:false,
+          color:'#c040ff', icon:'🔮',
+          isEnemyProj:true,
+          life:d/280+0.5,
+          piercing:0, hitTargets:new Set(),
+          size:5, aoe:false, skill:null,
+        });
+        spawnSlash(e.x+Math.cos(angle)*18, e.y+Math.sin(angle)*18, angle, 'arrow_puff','#c040ff', 0.8);
+        return; // don't apply melee dmg
+      }
+      
+      // Melee — spawn slash effect toward player
+      const angle=Math.atan2(p.y-e.y,p.x-e.x);
+      const slashType=e.weaponType==='axe'?'sword':e.weaponType==='hammer'?'sword':'sword';
+      spawnSlash(e.x+Math.cos(angle)*e.size, e.y+Math.sin(angle)*e.size, angle, slashType,'#ff6060',0.85);
       
       // Shield absorption
       if(p.shield>0){
@@ -2571,6 +3111,7 @@ function updateEnemies(dt){
         if(p.hp<=0) playerDeath();
       }
     }
+    if(e.attackAnim>0) e.attackAnim=Math.max(0,e.attackAnim-dt*3.5);
   });
 }
 
@@ -2649,6 +3190,18 @@ function buildSkillBar(){
   refreshSkillBar();
 }
 
+function skillTypeSymbol(sk){
+  if(!sk) return '';
+  // Heal types
+  if(sk.type==='heal'||sk.type==='heal_dot') return '<span style="color:#50e080;font-size:0.8rem">♥</span>';
+  // Buff/defense
+  if(sk.type==='buff'||sk.category==='Buff'||sk.category==='Defense') return '<span style="color:#a0c0ff;font-size:0.8rem">✦</span>';
+  // AoE
+  if(sk.aoe||sk.type==='aoe_self') return '<span style="color:#ffaa40;font-size:0.8rem">⭕</span>';
+  // Single target (melee, projectile, dash_attack)
+  return '<span style="color:#e06060;font-size:0.8rem">⚔</span>';
+}
+
 function refreshSkillBar(){
   const p=G.player;
   for(let i=0;i<8;i++){
@@ -2657,7 +3210,7 @@ function refreshSkillBar(){
     const skId=p.equippedSkills[i];
     const sk=skId?ALL_SKILLS[skId]:null;
     if(sk){
-      slot.innerHTML=`<span class="skill-key">${i+1}</span>${sk.icon}<span class="skill-cost">${sk.cost}</span>`;
+      slot.innerHTML=`<span class="skill-key">${i+1}</span>${sk.icon}<span class="skill-cost">${sk.cost}</span><span class="skill-type">${skillTypeSymbol(sk)}</span>`;
     } else {
       slot.innerHTML=`<span class="skill-key">${i+1}</span><span style="color:var(--border);font-size:0.7rem">—</span>`;
     }
@@ -2871,8 +3424,26 @@ function updateProjectiles(dt){
     if(proj.life<=0) return false;
     if(proj.x<-200||proj.x>G.worldSize+200||proj.y<-200||proj.y>G.worldSize+200) return false;
     
+    // Enemy projectiles hit the player
+    if(proj.isEnemyProj){
+      const p=G.player;
+      if(p&&!p.isDead&&dist(proj,p)<=18+proj.size){
+        let dmg=proj.dmg;
+        const armor=getArmor();
+        dmg=mitigateDmg(dmg,armor);
+        if(p.shield>0){const abs=Math.min(p.shield,dmg);p.shield-=abs;dmg-=abs;if(dmg<=0){spawnFloatNum(p.x,p.y,'BLOCKED','#4080ff',false);return false;}}
+        if(dmg>0){
+          p.hp=Math.max(0,p.hp-dmg);
+          spawnFloatNum(p.x,p.y,`-${dmg}`,'#ff4040',false);
+          spawnParticles(p.x,p.y,'#c040ff',4);
+          if(p.hp<=0) playerDeath();
+        }
+        return false;
+      }
+      return true;
+    }
+    
     // Hit detection
-    let hit=false;
     for(const e of G.enemies){
       if(e.hp<=0||proj.hitTargets.has(e)) continue;
       if(dist(proj,e)<=e.size+proj.size){
@@ -2890,7 +3461,6 @@ function updateProjectiles(dt){
         }
         
         if(proj.aoe){
-          // AoE splash
           G.enemies.forEach(e2=>{
             if(e2!==e&&e2.hp>0&&dist(proj,e2)<=50){
               dealDamage(e2,Math.round(proj.dmg*0.6),false,proj.color);
@@ -3079,10 +3649,13 @@ function hexToRgb(hex){
 }
 
 // ======================================================
-// GROUND ITEMS
+// GROUND ITEMS — Gold coins and loot drops
+// PICKUP_RADIUS = how close the player must be to auto-collect (pixels)
+//   ← Increase this to make pickup easier (e.g. 60 = very generous)
+// RARITY_GLOW = the colored glow/border each rarity gets in the UI
 // ======================================================
 const RARITY_GLOW = {Common:'#888888',Uncommon:'#40a040',Rare:'#4080c0',Epic:'#a040c0',Legendary:'#c09020'};
-const PICKUP_RADIUS = 36;
+const PICKUP_RADIUS = 36; // ← auto-collect distance in pixels
 
 // Gold coin pickup system
 function spawnGoldPickup(x, y, amount){
@@ -3112,12 +3685,29 @@ function spawnGroundItem(item, x, y){
 function updateGroundItems(dt){
   if(!G.groundItems||!G.groundItems.length) return;
   const p=G.player;
+  // Gold magnet range = 1.5× melee weapon autoRange (default sword ~60)
+  // ── Gold magnet ──────────────────────────────────────────────
+  // magnetRange = 1.5 × your melee weapon's range (or 60 if ranged/no weapon)
+  // Gold coins within this range automatically fly toward the player.
+  // ← Change 1.5 to a bigger number (e.g. 3.0) for a stronger magnet
+  // ← Change 60 to change default magnet range when using ranged weapons
+  const ws=getWeaponAutoStats(p.equipment&&p.equipment.weapon);
+  const meleeRange=(ws.autoType==='melee'||ws.autoType==='aoe_melee')? ws.autoRange : 60;
+  const magnetRange=meleeRange*1.5; // ← gold magnet radius multiplier
   G.groundItems=G.groundItems.filter(gi=>{
     gi.spawnT+=dt;
     gi.bobT+=dt*2.5;
     gi.glowPulse=(gi.glowPulse||0)+dt;
+    const d=dist(p,gi);
+    // Gold magnet: pull gold toward player
+    if(gi.isGold && d<magnetRange && d>PICKUP_RADIUS){
+      const speed=Math.min(400, 180+(magnetRange-d)*3);
+      const nx=(p.x-gi.x)/d, ny=(p.y-gi.y)/d;
+      gi.x+=nx*speed*dt;
+      gi.y+=ny*speed*dt;
+    }
     // Check pickup
-    if(dist(p,gi)<PICKUP_RADIUS){
+    if(d<PICKUP_RADIUS){
       if(gi.isGold){
         p.gold+=gi.goldAmt;
         spawnGoldFloat('+'+gi.goldAmt+'g');
@@ -3145,19 +3735,24 @@ function drawGroundItems(){
     const x=gi.x, y=gi.y;
     const bob=Math.sin(gi.bobT)*5;
     if(gi.isGold){
-      // Gold coin rendering
+      // Gold coin — always bright shine, pulsing hard
+      const pulse=0.7+Math.sin(gi.glowPulse*4)*0.3;
       ctx.save();
-      ctx.shadowColor='#f0d040'; ctx.shadowBlur=8+Math.sin(gi.glowPulse*3)*4;
-      ctx.font='16px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowColor='#f0d040'; ctx.shadowBlur=18+pulse*12;
+      // Radial glow circle under coin
+      const grd=ctx.createRadialGradient(x,y+bob,0,x,y+bob,18);
+      grd.addColorStop(0,'rgba(255,220,50,0.35)');
+      grd.addColorStop(1,'rgba(255,180,0,0)');
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(x,y+bob,18,0,Math.PI*2); ctx.fill();
+      ctx.font='18px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText('🪙',x,y+bob);
       ctx.shadowBlur=0; ctx.restore();
-      if(G.player && dist(G.player,gi)<100){
-        ctx.globalAlpha=Math.min(1,(100-dist(G.player,gi))/50);
-        ctx.font='bold 9px Cinzel,serif'; ctx.textAlign='center';
-        ctx.fillStyle='#f0d040';
-        ctx.fillText('+'+gi.goldAmt+'g',x,y+bob-14);
-        ctx.globalAlpha=1;
-      }
+      // Label always visible (not just close)
+      ctx.globalAlpha=0.9;
+      ctx.font='bold 9px Cinzel,serif'; ctx.textAlign='center';
+      ctx.fillStyle='#f0d040';
+      ctx.fillText('+'+gi.goldAmt+'g',x,y+bob-15);
+      ctx.globalAlpha=1;
       return;
     }
     const glowColor=RARITY_GLOW[gi.item.rarity]||'#888';
@@ -3467,11 +4062,13 @@ function updateStatusBar(){
 function updateHUD(){
   if(!G.player||!G.player.cls) return;
   const p=G.player;
+  const MAX_LEVEL=20;
   document.getElementById('hud-name').textContent=CLASSES[p.cls].name;
-  document.getElementById('hud-level').textContent=`Level ${p.level}`;
+  const isMax=p.level>=MAX_LEVEL;
+  document.getElementById('hud-level').textContent=isMax?`Level ${p.level} ⚔️MAX`:`Level ${p.level}`;
   document.getElementById('hp-bar').style.width=(p.hp/getMaxHP()*100)+'%';
   document.getElementById('en-bar').style.width=(p.energy/getMaxEnergy()*100)+'%';
-  document.getElementById('xp-bar').style.width=(p.xp/p.xpNext*100)+'%';
+  document.getElementById('xp-bar').style.width=isMax?100:(p.xp/p.xpNext*100)+'%';
   const hpVal=document.getElementById('hp-val');
   const enVal=document.getElementById('en-val');
   const xpVal=document.getElementById('xp-val');
@@ -3547,6 +4144,21 @@ function updateHUD(){
   } else if(tradeBtn){
     tradeBtn.remove();
   }
+  // Show/hide chest button
+  let chestBtn=document.getElementById('chest-btn');
+  if(G.chestNearby&&!G.shopOpen){
+    if(!chestBtn){
+      chestBtn=document.createElement('button');
+      chestBtn.id='chest-btn';
+      chestBtn.className='trade-hud-btn';
+      chestBtn.style.bottom='210px';
+      document.getElementById('hud').appendChild(chestBtn);
+    }
+    chestBtn.textContent='🗄 Shared Stash';
+    chestBtn.onclick=()=>openChest();
+  } else if(chestBtn){
+    chestBtn.remove();
+  }
   
   // Cooldown overlays
   const now=performance.now()/1000;
@@ -3582,6 +4194,11 @@ function toggleAutoAttack(){
 // ======================================================
 // RENDER
 // ======================================================
+// ======================================================
+// RENDER LOOP — draws everything to the canvas each frame
+// Order matters: things drawn later appear on top.
+// Ground → Corpses → Projectiles → Enemies → Player → UI
+// ======================================================
 function render(){
   if(!ctx||!G.player) return;
   const W=canvas.width, H=canvas.height;
@@ -3609,10 +4226,11 @@ function render(){
   ctx.globalAlpha=1;
 
   drawGroundItems();
+  drawCorpses();
 
   G.projectiles.forEach(proj=>{
     ctx.save();
-    ctx.shadowColor=proj.icon==='➶'?'#ffcc44':'#a040ff';
+    ctx.shadowColor=proj.isEnemyProj?'#c040ff':(proj.icon==='➶'?'#ffcc44':'#a040ff');
     ctx.shadowBlur=proj.isCrit?18:10;
     const _pa=Math.atan2(proj.vy,proj.vx);
     ctx.translate(proj.x,proj.y);ctx.rotate(_pa);
@@ -3748,7 +4366,7 @@ function drawPortals(){
       ctx.stroke();
     }
 
-    // Portal center
+    // Portal center fill
     ctx.globalAlpha=0.3*pulse;
     ctx.fillStyle=portal.color;
     ctx.beginPath();ctx.arc(x,y,r*0.55,0,Math.PI*2);ctx.fill();
@@ -3756,14 +4374,22 @@ function drawPortals(){
     ctx.globalAlpha=1;
     ctx.shadowBlur=0;
 
-    // Label
+    // Zone name label
     ctx.font='bold 11px Cinzel, serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.fillText(portal.label,x,y+r+14);
-    ctx.fillStyle='#fff';
     ctx.fillText(portal.label,x,y+r+13);
+    ctx.fillStyle='#fff';
+    ctx.fillText(portal.label,x,y+r+12);
+
+    // Level range sublabel
+    if(portal.sublabel){
+      ctx.font='9px Cinzel, serif';
+      ctx.fillStyle='rgba(0,0,0,0.5)';
+      ctx.fillText(portal.sublabel,x,y+r+26);
+      ctx.fillStyle=portal.color;
+      ctx.fillText(portal.sublabel,x,y+r+25);
+    }
 
     // Emoji icon
     ctx.font='18px serif';
@@ -3771,116 +4397,179 @@ function drawPortals(){
   });
 }
 
+// ======================================================
+// TOWN DRAWING — draws the Aetherhaven town map
+// This draws: vendor stalls, the healing shrine, the shared stash chest,
+// the portal plaza labels, and row labels between vendor groups.
+// Vendor positions are set in ZONES[3].shopNPCs above (x, y coordinates).
+// The shrine position is set in ZONES[3].shrine above.
+// ======================================================
 function drawShopNPC(){
   const zone=ZONES[G.zone];
   if(!zone.isShop) return;
   const t=performance.now()/1000;
 
-  // Draw shrine
+  // ── Portal Plaza sign ────────────────────────────────
+  const pgate={x:1200,y:1530};
+  ctx.save();
+  ctx.fillStyle='rgba(20,10,35,0.9)'; ctx.strokeStyle='#6040a0'; ctx.lineWidth=2;
+  ctx.fillRect(pgate.x-80,pgate.y-32,160,28); ctx.strokeRect(pgate.x-80,pgate.y-32,160,28);
+  ctx.font='bold 11px Cinzel, serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#a070e0'; ctx.fillText('⬡ PORTAL PLAZA ⬡',pgate.x,pgate.y-18);
+  ctx.restore();
+
+  // ── Shared Storage Chest (player home) ───────────────
+  if(zone.storageChest){
+    const sc=zone.storageChest;
+    const isNear=G.player&&dist(G.player,sc)<80;
+    // House outline
+    ctx.save();
+    ctx.fillStyle='rgba(18,12,28,0.92)'; ctx.strokeStyle=isNear?'#c9a84c':'#4a3a6a'; ctx.lineWidth=2;
+    // Walls
+    ctx.beginPath(); ctx.rect(sc.x-80,sc.y-50,160,90); ctx.fill(); ctx.stroke();
+    // Roof
+    ctx.beginPath(); ctx.moveTo(sc.x-90,sc.y-50); ctx.lineTo(sc.x,sc.y-100); ctx.lineTo(sc.x+90,sc.y-50); ctx.closePath();
+    ctx.fillStyle='rgba(40,20,60,0.95)'; ctx.fill(); ctx.strokeStyle=isNear?'#c9a84c':'#4a3a6a'; ctx.stroke();
+    // Door
+    ctx.fillStyle='rgba(80,50,30,0.8)'; ctx.strokeStyle='#604020'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.rect(sc.x-16,sc.y+4,32,36); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#c0a040'; ctx.beginPath(); ctx.arc(sc.x+10,sc.y+22,2.5,0,Math.PI*2); ctx.fill();
+    // Chest
+    const chestPulse=isNear?Math.sin(t*3)*3:0;
+    ctx.shadowColor=isNear?'#f0d040':'#806020'; ctx.shadowBlur=isNear?14+chestPulse:4;
+    ctx.fillStyle='#704010'; ctx.strokeStyle='#c0a030'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.rect(sc.x-18,sc.y-26,36,22); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#8a5020'; ctx.beginPath(); ctx.rect(sc.x-18,sc.y-26,36,9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#f0d040'; ctx.beginPath(); ctx.arc(sc.x,sc.y-17,3.5,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // Label
+    ctx.font='bold 11px Cinzel, serif'; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillText('Shared Stash',sc.x,sc.y+43);
+    ctx.fillStyle=isNear?'#f0d040':'#c0a84c'; ctx.fillText('Shared Stash',sc.x,sc.y+42);
+    if(isNear&&!G.shopOpen){
+      ctx.font='9px Cinzel, serif'; ctx.fillStyle='rgba(220,200,100,0.8)';
+      ctx.fillText('[TAP to open]',sc.x,sc.y+56);
+    }
+    ctx.restore();
+  }
+
+  // ── Shrine of Rest ───────────────────────────────────
   if(zone.shrine){
     const s=zone.shrine;
     const pulse=Math.sin(t*2)*0.3+0.7;
     const active=(G.shrineEffect||0)>0.05;
-    // Ground glow
     const grad=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.radius);
-    grad.addColorStop(0,`rgba(180,230,255,${0.08+(G.shrineEffect||0)*0.12})`);
+    grad.addColorStop(0,active?'rgba(80,200,255,0.25)':'rgba(60,80,120,0.18)');
     grad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=grad;
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.radius,0,Math.PI*2); ctx.fill();
-
-    // Stone base
-    ctx.fillStyle='#5a5060'; ctx.strokeStyle='#8a7a90'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.ellipse(s.x,s.y+20,28,10,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    ctx.fillStyle='#4a4055';
-    ctx.fillRect(s.x-10,s.y-30,20,50);
-    ctx.strokeRect(s.x-10,s.y-30,20,50);
-
-    // Cross
-    ctx.shadowColor=active?'#a0e0ff':'#8090c0';
-    ctx.shadowBlur=active?16*pulse:4;
-    ctx.fillStyle=active?`rgba(160,220,255,${pulse})`:'#8090c0';
-    // Vertical bar
-    ctx.fillRect(s.x-5,s.y-55,10,45);
-    // Horizontal bar
-    ctx.fillRect(s.x-18,s.y-45,36,10);
-    // Cross glow gems
+    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(s.x,s.y,s.radius,0,Math.PI*2); ctx.fill();
+    ctx.save();
+    ctx.shadowColor=active?'#80d0ff':'#4060a0'; ctx.shadowBlur=active?22*pulse:10;
+    ctx.strokeStyle=active?`rgba(120,220,255,${0.5*pulse})`:`rgba(80,100,160,0.4)`;
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.radius-4,0,Math.PI*2); ctx.stroke();
+    // Inner crystal
+    ctx.fillStyle=active?`rgba(120,220,255,${0.7*pulse})`:'rgba(80,120,200,0.5)';
+    ctx.beginPath(); ctx.arc(s.x,s.y,12,0,Math.PI*2); ctx.fill();
+    ctx.font='20px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('✨',s.x,s.y);
+    ctx.shadowBlur=0; ctx.restore();
+    ctx.font='bold 11px Cinzel, serif'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillText('Shrine of Rest',s.x,s.y+38);
+    ctx.fillStyle=active?'#a0e0ff':'#c0d0e0'; ctx.fillText('Shrine of Rest',s.x,s.y+37);
     if(active){
-      ctx.fillStyle=`rgba(200,240,255,${pulse*0.9})`;
-      ctx.beginPath(); ctx.arc(s.x,s.y-35,4,0,Math.PI*2); ctx.fill();
-    }
-    ctx.shadowBlur=0;
-
-    // Label
-    ctx.font='bold 11px Cinzel, serif';
-    ctx.textAlign='center';
-    ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.fillText('Shrine of Rest',s.x,s.y+38);
-    ctx.fillStyle=active?'#a0e0ff':'#c0d0e0';
-    ctx.fillText('Shrine of Rest',s.x,s.y+37);
-    if(active){
-      ctx.font='10px serif';
-      ctx.fillStyle='rgba(100,220,255,0.8)';
+      ctx.font='10px serif'; ctx.fillStyle='rgba(100,220,255,0.8)';
       ctx.fillText(`+${zone.shrine.hpRegen} HP/s  +${zone.shrine.enRegen} EN/s`,s.x,s.y+52);
     }
   }
 
-  // Draw all NPCs
+  // ── Vendor district row labels ────────────────────────
+  const rowLabels=[
+    {x:1200, y:760,  text:'⚔  WEAPON ROW  ⚔'},
+    {x:1200, y:1000, text:'🛡  DEFENSE ROW  🛡'},
+    {x:1140, y:1200, text:'◇  ACCESSORIES & GENERAL'},
+  ];
+  rowLabels.forEach(rl=>{
+    ctx.save();
+    ctx.font='bold 10px Cinzel, serif'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillText(rl.text,rl.x,rl.y+1);
+    ctx.fillStyle='rgba(180,160,100,0.7)'; ctx.fillText(rl.text,rl.x,rl.y);
+    ctx.restore();
+  });
+
+  // ── Vendor stalls ────────────────────────────────────
+  const modeColors={
+    blades:      {stall:'#3a1010',stroke:'#d06030',label:'⚔ BLADES',      labelColor:'#e08060'},
+    daggers:     {stall:'#2a1020',stroke:'#c02060',label:'🗡 DAGGERS',     labelColor:'#e04080'},
+    polearms:    {stall:'#1a2a10',stroke:'#80c060',label:'↑ POLEARMS',     labelColor:'#a0e070'},
+    scythes:     {stall:'#1a0a0a',stroke:'#a02020',label:'☠ SCYTHES',      labelColor:'#e04040'},
+    bows:        {stall:'#1a200a',stroke:'#a0c030',label:'🏹 BOWS',        labelColor:'#c0e050'},
+    staves:      {stall:'#1a0a30',stroke:'#9040e0',label:'✦ STAVES',       labelColor:'#c060ff'},
+    shields_mh:  {stall:'#102030',stroke:'#4080c0',label:'🛡 WAR SHIELDS', labelColor:'#60a0e0'},
+    shields_oh:  {stall:'#0a1828',stroke:'#3060a0',label:'◈ OFFHAND SHLD', labelColor:'#5090d0'},
+    shields:     {stall:'#101828',stroke:'#6090b0',label:'🛡 SHIELDS',     labelColor:'#80b0d0'},
+    offhand:     {stall:'#1a1020',stroke:'#806080',label:'◇ OFFHAND',      labelColor:'#c090c0'},
+    heavy_armor: {stall:'#101828',stroke:'#6090b0',label:'⛏ PLATE',        labelColor:'#80b0d0'},
+    light_armor: {stall:'#201808',stroke:'#c08030',label:'◈ LEATHER',      labelColor:'#e0a040'},
+    accessories: {stall:'#28101a',stroke:'#e060a0',label:'◇ JEWELS',       labelColor:'#ff80c0'},
+    general:     {stall:'#1e0e30',stroke:'#9060c0',label:'★ GENERAL',      labelColor:'#c9a84c'},
+  };
+
   const npcs=zone.shopNPCs||[zone.shopNPC];
   npcs.forEach(npc=>{
     if(!npc) return;
     const x=npc.x, y=npc.y;
     const isNearby=G.activeNPC===npc;
+    const mc=modeColors[npc.mode]||modeColors.general;
 
-    // Stall color per NPC mode
-    const stallColor=npc.mode==='weapons'?'#402020':npc.mode==='all'?'#204040':'#402040';
-    const strokeColor=npc.mode==='weapons'?'#c04040':npc.mode==='all'?'#40a0c0':'#6040a0';
-
-    // Building / stall backdrop
-    ctx.fillStyle=stallColor+'d9';
-    ctx.strokeStyle=strokeColor;
-    ctx.lineWidth=2;
+    // Stall backdrop
+    ctx.fillStyle=mc.stall+'d9'; ctx.strokeStyle=mc.stroke; ctx.lineWidth=2;
     ctx.beginPath();
-    ctx.moveTo(x-60,y-40);ctx.lineTo(x,y-65);ctx.lineTo(x+60,y-40);
-    ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.fillStyle=stallColor+'d9';
-    ctx.fillRect(x-55,y-40,110,55);
-    ctx.strokeRect(x-55,y-40,110,55);
+    ctx.moveTo(x-52,y-36); ctx.lineTo(x,y-58); ctx.lineTo(x+52,y-36);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=mc.stall+'d9';
+    ctx.fillRect(x-48,y-36,96,50); ctx.strokeRect(x-48,y-36,96,50);
+    // Awning stripes
     for(let i=0;i<5;i++){
-      ctx.fillStyle=i%2===0?strokeColor:stallColor;
-      ctx.fillRect(x-55+i*22,y-40,22,10);
+      ctx.fillStyle=i%2===0?mc.stroke+'80':mc.stall;
+      ctx.fillRect(x-48+i*19.2,y-36,19.2,9);
     }
-    ctx.fillStyle='rgba(0,0,0,0.7)';
-    ctx.fillRect(x-40,y-58,80,18);
-    ctx.font='bold 10px Cinzel, serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillStyle=npc.mode==='weapons'?'#e08060':npc.mode==='all'?'#60d0c0':'#c9a84c';
-    const label=npc.mode==='weapons'?'SMITH':npc.mode==='all'?'EMPORIUM':'SHOP';
-    ctx.fillText(label,x,y-49);
+    // Sign banner
+    ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.fillRect(x-44,y-55,88,18);
+    ctx.font='bold 9px Cinzel, serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle=mc.labelColor; ctx.fillText(mc.label,x,y-46);
 
-    const bob=Math.sin(t*1.2)*2;
-    ctx.font='28px serif';
-    ctx.fillText(npc.icon,x,y-10+bob);
+    // NPC character
+    const bob=Math.sin(t*1.2+npc.x*0.01)*2;
+    ctx.font='26px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(npc.icon,x,y-8+bob);
 
-    ctx.font='12px Cinzel, serif';
-    ctx.fillStyle='rgba(0,0,0,0.6)';
-    ctx.fillText(npc.name,x,y+22);
-    ctx.fillStyle='#d0cfe0';
-    ctx.fillText(npc.name,x,y+21);
+    // Name
+    ctx.font='11px Cinzel, serif';
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillText(npc.name,x,y+20);
+    ctx.fillStyle='#d0cfe0'; ctx.fillText(npc.name,x,y+19);
+    // Title
+    ctx.font='9px Cinzel, serif'; ctx.fillStyle=mc.labelColor+'cc';
+    ctx.fillText(npc.title,x,y+31);
 
     if(isNearby&&!G.shopOpen){
-      ctx.shadowColor=strokeColor;
-      ctx.shadowBlur=14;
-      ctx.strokeStyle=strokeColor;
-      ctx.lineWidth=2;
+      ctx.save();
+      ctx.shadowColor=mc.stroke; ctx.shadowBlur=14;
+      ctx.strokeStyle=mc.stroke; ctx.lineWidth=2;
       ctx.setLineDash([4,4]);
-      ctx.beginPath();ctx.arc(x,y+5,50,0,Math.PI*2);ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.arc(x,y+5,46,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]); ctx.shadowBlur=0; ctx.restore();
     }
   });
 }
 
+// ======================================================
+// DRAW PLAYER — draws the player character on the canvas
+// The player is drawn at the center of the screen.
+// Body shape, colors, and weapon are all drawn here using canvas lines/shapes.
+// Player body color comes from CLASSES[cls].sprite.body
+// Player armor color comes from CLASSES[cls].sprite.armor
+// Weapons are drawn based on the equipped weapon's weaponType
+// ======================================================
 function drawPlayer(){
   const p=G.player;
   const cls=CLASSES[p.cls];
@@ -4361,28 +5050,65 @@ function drawPlayer(){
     ctx.shadowBlur=0; ctx.restore();
 
   } else if(wtype==='spear'){
-    // NEW — Spartan leaf-blade spear with forward thrust lunge
-    const thrust=swingT>0?swingT*22:0;
+    // NEW — long pike with forward thrust lunge
+    const thrust=swingT>0?swingT*28:0;
     ctx.save(); ctx.rotate(-0.15);
-    // Pole (behind body, starts further back)
+    // Long pole
     ctx.strokeStyle='#8a6820'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(-18,20); ctx.lineTo(14+thrust,-12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-22,24); ctx.lineTo(16+thrust,-14); ctx.stroke();
     ctx.strokeStyle='rgba(180,140,60,0.3)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(-18,20); ctx.lineTo(14+thrust,-12); ctx.stroke();
-    // Spartan leaf blade — wide, diamond/leaf shape
+    ctx.beginPath(); ctx.moveTo(-22,24); ctx.lineTo(16+thrust,-14); ctx.stroke();
+    // Large leaf blade
     ctx.shadowColor='#b0c8e0'; ctx.shadowBlur=swingT>0?10:2;
     ctx.fillStyle='#c8d4e0'; ctx.strokeStyle='#e8f0f8'; ctx.lineWidth=1.5;
     ctx.beginPath();
-    ctx.moveTo(14+thrust,-12);
-    ctx.bezierCurveTo(10+thrust,-17,21+thrust,-21,18+thrust,-28);
-    ctx.bezierCurveTo(20+thrust,-21,26+thrust,-15,14+thrust,-12);
+    ctx.moveTo(16+thrust,-14);
+    ctx.bezierCurveTo(11+thrust,-21,24+thrust,-26,21+thrust,-35);
+    ctx.bezierCurveTo(23+thrust,-25,30+thrust,-18,16+thrust,-14);
     ctx.closePath(); ctx.fill(); ctx.stroke();
-    // Blade ridge
     ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(14+thrust,-13); ctx.lineTo(18+thrust,-27); ctx.stroke();
-    // Socket ring
+    ctx.beginPath(); ctx.moveTo(16+thrust,-15); ctx.lineTo(21+thrust,-34); ctx.stroke();
     ctx.strokeStyle='#9090a0'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(14+thrust,-12,2.5,-Math.PI*0.9,Math.PI*0.3); ctx.stroke();
+    ctx.beginPath(); ctx.arc(16+thrust,-14,2.5,-Math.PI*0.9,Math.PI*0.3); ctx.stroke();
+    ctx.shadowBlur=0; ctx.restore();
+
+  } else if(wtype==='spear_1h'){
+    // Short spear — shorter shaft, pairs with offhand
+    const thrust=swingT>0?swingT*18:0;
+    // Draw offhand FIRST (before rotation context)
+    drawOffhandItem();
+    ctx.save(); ctx.rotate(-0.15);
+    ctx.strokeStyle='#8a6820'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(-10,16); ctx.lineTo(14+thrust,-10); ctx.stroke();
+    ctx.shadowColor='#90c8e8'; ctx.shadowBlur=swingT>0?8:1;
+    ctx.fillStyle='#b8c4d0'; ctx.strokeStyle='#d8e4f0'; ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(14+thrust,-10);
+    ctx.bezierCurveTo(10+thrust,-16,20+thrust,-20,18+thrust,-27);
+    ctx.bezierCurveTo(19+thrust,-20,25+thrust,-14,14+thrust,-10);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(14+thrust,-11); ctx.lineTo(18+thrust,-26); ctx.stroke();
+    ctx.shadowBlur=0; ctx.restore();
+
+  } else if(wtype==='shield_mh'){
+    // War Shield as main weapon — large heater shield with bash animation
+    const bash=swingT>0?swingT*10:0;
+    ctx.save(); ctx.translate(bash, 0);
+    ctx.shadowColor='#6090c0'; ctx.shadowBlur=swingT>0?12:3;
+    // Shield body — heater shape
+    ctx.fillStyle='#2a4880'; ctx.strokeStyle='#5070a0'; ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(8,-20); ctx.lineTo(28,-20); ctx.lineTo(30,0);
+    ctx.lineTo(18,16); ctx.lineTo(6,16); ctx.lineTo(6,0); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Cross emblem
+    ctx.strokeStyle='#c0a030'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(18,-20); ctx.lineTo(18,14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(6,-4); ctx.lineTo(30,-4); ctx.stroke();
+    // Highlight
+    ctx.fillStyle='rgba(255,255,255,0.1)';
+    ctx.beginPath(); ctx.moveTo(9,-19); ctx.lineTo(17,-19); ctx.lineTo(17,-4); ctx.lineTo(9,-4); ctx.closePath(); ctx.fill();
     ctx.shadowBlur=0; ctx.restore();
 
   } else if(wtype==='spear_old'){
@@ -4453,14 +5179,12 @@ function drawPlayer(){
     ctx.beginPath(); ctx.arc(20+jab,-18,2,0,Math.PI*2); ctx.fill();
     ctx.shadowBlur=0; ctx.restore();
 
-  } else if(wtype==='focus'||wtype==='shield_mh'){
-    // Focus or main hand shield — held in front
+  } else if(wtype==='focus'){
     const pulse=Math.sin(t*3)*1;
-    ctx.shadowColor=wtype==='focus'?'#4080ff':'#6090c0';
-    ctx.shadowBlur=4+pulse;
+    ctx.shadowColor='#4080ff'; ctx.shadowBlur=4+pulse;
     ctx.font='22px serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(wtype==='focus'?'🔮':'🛡️',16,-8);
+    ctx.fillText('🔮',16,-8);
     ctx.shadowBlur=0;
   }
 
@@ -4494,11 +5218,17 @@ function drawRangeCircles(){
   ctx.fillStyle='rgba(100,200,255,0.5)';
   ctx.fillText(`Auto (${autoRange})`,p.x,p.y-autoRange-4);
 
-  // Enemy attack ranges
+  // Enemy attack ranges — red for normal, gold dashed for bosses
+  // (bosses also draw their own range ring in drawEnemy, this is for debug/showRanges mode)
   G.enemies&&G.enemies.forEach(e=>{
     if(e.hp<=0) return;
-    ctx.strokeStyle='rgba(255,80,80,0.2)';
-    ctx.lineWidth=1;
+    if(e.isBoss){
+      ctx.strokeStyle='rgba(220,180,30,0.35)';
+      ctx.lineWidth=1.5;
+    } else {
+      ctx.strokeStyle='rgba(255,80,80,0.2)';
+      ctx.lineWidth=1;
+    }
     ctx.setLineDash([3,5]);
     ctx.beginPath(); ctx.arc(e.x,e.y,e.range||45,0,Math.PI*2); ctx.stroke();
   });
@@ -4506,60 +5236,340 @@ function drawRangeCircles(){
   ctx.restore();
 }
 
+// ======================================================
+// DRAW ENEMY — draws a single enemy based on its archetype
+// archetype controls the visual style:
+//   'humanoid_bare'    = unarmored human-shaped body
+//   'humanoid_armored' = armored human with helmet and shoulder plates
+//   'undead'           = semi-transparent ghostly circle that flickers
+// Enemy weapon is drawn in the right hand if e.weaponType is set.
+// The gold dashed ring shows when an enemy is selected (tapped) in the stats panel.
+// ======================================================
 function drawEnemy(e){
   if(e.hp<=0) return;
   const x=Math.round(e.x), y=Math.round(e.y);
+  const arch=e.archetype||'beast';
+  
+  // Attack animation: jolt toward player
+  let drawX=x, drawY=y;
+  if(e.attackAnim>0&&G.player){
+    const angle=Math.atan2(G.player.y-e.y,G.player.x-e.x);
+    const jolt=Math.sin(e.attackAnim*Math.PI)*8*e.attackAnim;
+    drawX=x+Math.cos(angle)*jolt;
+    drawY=y+Math.sin(angle)*jolt;
+  }
+  
+  // Selected target highlight
+  if(G.targetedEnemy===e){
+    ctx.save();
+    ctx.strokeStyle='#f0d040'; ctx.lineWidth=2;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.arc(drawX,drawY,e.size+6,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+  }
   
   // Shadow
   ctx.fillStyle='rgba(0,0,0,0.25)';
   ctx.beginPath();
-  ctx.ellipse(x,y+e.size*0.6,e.size*0.8,e.size*0.25,0,0,Math.PI*2);
+  ctx.ellipse(drawX,drawY+e.size*0.6,e.size*0.8,e.size*0.25,0,0,Math.PI*2);
   ctx.fill();
   
   // Flash on hit
   if(e.flashTimer>0){
     ctx.fillStyle='rgba(255,100,100,0.5)';
-    ctx.beginPath();ctx.arc(x,y,e.size+4,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(drawX,drawY,e.size+4,0,Math.PI*2);ctx.fill();
   }
   
-  // Body
-  ctx.fillStyle=e.color;
-  if(e.isBoss){
-    // Boss: larger with glow
-    ctx.shadowColor=e.color;
-    ctx.shadowBlur=15;
-    ctx.beginPath();ctx.arc(x,y,e.size,0,Math.PI*2);ctx.fill();
-    ctx.shadowBlur=0;
-    // Crown
-    ctx.font='16px serif';
-    ctx.textAlign='center';
-    ctx.fillText('👑',x,y-e.size-4);
+  ctx.save();
+  if(e.isBoss){ ctx.shadowColor=e.color; ctx.shadowBlur=15; }
+  
+  if(arch==='humanoid_armored'||arch==='humanoid_bare'){
+    // --- Humanoid body ---
+    const bodyColor=e.color;
+    const armorC=e.armorColor||(arch==='humanoid_bare'?null:'#505060');
+    const sz=e.size;
+    // Legs
+    ctx.fillStyle=arch==='humanoid_bare'?bodyColor:(armorC);
+    ctx.fillRect(drawX-sz*0.4, drawY+sz*0.2, sz*0.35, sz*0.7);
+    ctx.fillRect(drawX+sz*0.05, drawY+sz*0.2, sz*0.35, sz*0.7);
+    // Torso
+    ctx.fillStyle=arch==='humanoid_bare'?bodyColor:armorC;
+    ctx.fillRect(drawX-sz*0.5, drawY-sz*0.4, sz, sz*0.7);
+    if(arch==='humanoid_armored'){
+      // Armor plate highlight
+      ctx.fillStyle='rgba(255,255,255,0.12)';
+      ctx.fillRect(drawX-sz*0.45, drawY-sz*0.38, sz*0.9, sz*0.3);
+    }
+    // Head
+    ctx.fillStyle=bodyColor;
+    ctx.beginPath(); ctx.arc(drawX,drawY-sz*0.55,sz*0.38,0,Math.PI*2); ctx.fill();
+    if(arch==='humanoid_armored'){
+      // Helmet
+      ctx.fillStyle=armorC;
+      ctx.beginPath(); ctx.arc(drawX,drawY-sz*0.6,sz*0.36,-Math.PI,0); ctx.fill();
+      ctx.fillRect(drawX-sz*0.36,drawY-sz*0.6,sz*0.72,sz*0.12);
+    }
+    // Arms
+    ctx.fillStyle=arch==='humanoid_bare'?bodyColor:armorC;
+    ctx.fillRect(drawX-sz*0.85, drawY-sz*0.38, sz*0.35, sz*0.5);
+    ctx.fillRect(drawX+sz*0.5,  drawY-sz*0.38, sz*0.35, sz*0.5);
+    // Weapon in right hand
+    if(e.weaponType){
+      ctx.save();
+      ctx.translate(drawX+sz*0.68, drawY-sz*0.1);
+      ctx.rotate(-0.5+(e.attackAnim||0)*0.8);
+      drawWeaponIconTo(ctx, e.weaponType, '', sz*1.1);
+      ctx.restore();
+    }
+  } else if(arch==='beast'){
+    // --- Beast body: oval + head ---
+    const sz=e.size;
+    ctx.fillStyle=e.color;
+    // Large oval body
+    ctx.beginPath(); ctx.ellipse(drawX,drawY+sz*0.1,sz*1.0,sz*0.65,0,0,Math.PI*2); ctx.fill();
+    // Head
+    ctx.beginPath(); ctx.arc(drawX+sz*0.8,drawY-sz*0.1,sz*0.55,0,Math.PI*2); ctx.fill();
+    // Legs (4 stumps)
+    ctx.fillStyle=e.color;
+    [-0.5,-0.1,0.1,0.5].forEach((ox,i)=>{
+      ctx.fillRect(drawX+ox*sz*1.1-sz*0.12, drawY+sz*0.5, sz*0.24, sz*0.45);
+    });
+    // Eyes
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(drawX+sz*0.95,drawY-sz*0.25,sz*0.12,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.arc(drawX+sz*0.97,drawY-sz*0.25,sz*0.07,0,Math.PI*2); ctx.fill();
+  } else if(arch==='undead'){
+    // Ghostly: semi-transparent circle with icon
+    ctx.globalAlpha=0.75+Math.sin(performance.now()/500)*0.15;
+    ctx.fillStyle=e.color;
+    ctx.beginPath(); ctx.arc(drawX,drawY,e.size,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
   } else {
-    ctx.beginPath();ctx.arc(x,y,e.size,0,Math.PI*2);ctx.fill();
+    // Generic fallback
+    ctx.fillStyle=e.color;
+    ctx.beginPath(); ctx.arc(drawX,drawY,e.size,0,Math.PI*2); ctx.fill();
   }
   
-  // Icon
-  ctx.font=`${e.size}px serif`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(e.icon,x,y);
-  
-  // HP bar
+  ctx.shadowBlur=0;
+
+  // ── Boss extra visuals ────────────────────────────────
+  if(e.isBoss){
+    const t=performance.now()/1000;
+    const pulse=0.6+Math.sin(t*2.5)*0.4;
+
+    // Gold outer outline ring — pulses
+    ctx.save();
+    ctx.strokeStyle=`rgba(220,180,30,${0.5+pulse*0.3})`;
+    ctx.lineWidth=2.5;
+    ctx.shadowColor='#f0d040'; ctx.shadowBlur=8+pulse*8;
+    ctx.beginPath(); ctx.arc(drawX,drawY,e.size+4,0,Math.PI*2); ctx.stroke();
+    ctx.shadowBlur=0;
+    // Gold attack-range ring (dashed, always visible for bosses)
+    ctx.strokeStyle=`rgba(200,160,20,${0.2+pulse*0.15})`;
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([6,6]);
+    ctx.beginPath(); ctx.arc(drawX,drawY,e.range||68,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Crown
+    ctx.font=(e.size>30?'20px':'16px')+' serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('👑',drawX,drawY-e.size-2);
+  }
+
+  // ── HP bar ────────────────────────────────────────────
   if(G.showHPBars!==false){
-    const barW=e.size*2+4;
+    const barW=e.isBoss ? e.size*3+6 : e.size*2+4;
     const hpPct=e.hp/e.hpMax;
+    // Background
     ctx.fillStyle='#1a1a1a';
-    ctx.fillRect(x-barW/2,y-e.size-10,barW,4);
-    ctx.fillStyle=e.isBoss?'#c04040':'#408040';
-    ctx.fillRect(x-barW/2,y-e.size-10,barW*hpPct,4);
+    ctx.fillRect(drawX-barW/2,drawY-e.size-12,barW,5);
+    // Fill — gold gradient for bosses, green for normal
+    if(e.isBoss){
+      const grad=ctx.createLinearGradient(drawX-barW/2,0,drawX+barW/2,0);
+      grad.addColorStop(0,'#c09010'); grad.addColorStop(1,'#f0d040');
+      ctx.fillStyle=grad;
+    } else {
+      ctx.fillStyle='#408040';
+    }
+    ctx.fillRect(drawX-barW/2,drawY-e.size-12,barW*hpPct,5);
+    // Gold border for boss HP bar
+    if(e.isBoss){
+      ctx.strokeStyle='#a08020'; ctx.lineWidth=1;
+      ctx.strokeRect(drawX-barW/2,drawY-e.size-12,barW,5);
+    }
   }
-  
-  // Slow indicator
+
+  // ── Name label ────────────────────────────────────────
+  ctx.font=e.isBoss?'bold 10px Cinzel,serif':'bold 9px Cinzel,serif';
+  ctx.textAlign='center';
+  ctx.fillStyle=e.isBoss?'#f0d040':'#b0a080';
+  ctx.fillText(e.name+(e.isBoss?' 👑':''), drawX, drawY-e.size-16);
+
+  // ── Slow indicator ────────────────────────────────────
   if(e.slowTimer>0){
-    ctx.strokeStyle='rgba(80,140,255,0.6)';
-    ctx.lineWidth=2;
-    ctx.beginPath();ctx.arc(x,y,e.size+2,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(80,140,255,0.6)'; ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(drawX,drawY,e.size+2,0,Math.PI*2);ctx.stroke();
   }
+
+  ctx.restore();
+}
+
+// ======================================================
+// CORPSE SYSTEM
+// ======================================================
+// ======================================================
+// CORPSE SYSTEM — graveyard crosses left where enemies die
+// Each cross fades out over 'life' seconds (set in killEnemy above).
+// The alpha (transparency) drops from 1 to 0 over the last 3 seconds.
+// ======================================================
+function updateCorpses(dt){
+  if(!G.corpses||!G.corpses.length) return;
+  G.corpses=G.corpses.filter(c=>{
+    c.life-=dt;
+    c.alpha=Math.min(1, c.life/3); // fade out last 3s
+    return c.life>0;
+  });
+}
+
+function drawCorpses(){
+  if(!G.corpses||!G.corpses.length) return;
+  G.corpses.forEach(c=>{
+    const x=Math.round(c.x), y=Math.round(c.y);
+    const a=c.alpha||1;
+    ctx.save();
+    ctx.globalAlpha=a*0.85;
+    // Small dirt mound
+    ctx.fillStyle='rgba(60,40,20,0.5)';
+    ctx.beginPath();
+    ctx.ellipse(x,y+1,8,4,0,0,Math.PI*2);
+    ctx.fill();
+    // Cross vertical bar
+    ctx.strokeStyle='#807060';
+    ctx.lineWidth=2.2;
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x,y-10); ctx.lineTo(x,y+4); ctx.stroke();
+    // Cross horizontal bar
+    ctx.beginPath(); ctx.moveTo(x-5,y-6); ctx.lineTo(x+5,y-6); ctx.stroke();
+    // Slight glow so it's visible
+    ctx.shadowColor='#a09070'; ctx.shadowBlur=4;
+    ctx.strokeStyle='#a09070'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(x,y-10); ctx.lineTo(x,y+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-5,y-6); ctx.lineTo(x+5,y-6); ctx.stroke();
+    ctx.restore();
+  });
+}
+
+// ======================================================
+// ENEMY STATS PANEL
+// ======================================================
+function openEnemyPanel(enemy){
+  G.targetedEnemy=enemy;
+  const panel=document.getElementById('enemy-stats-panel');
+  panel.classList.add('visible');
+  updateEnemyStatsPanel();
+  initEnemyPanelDrag();
+}
+
+function closeEnemyPanel(){
+  G.targetedEnemy=null;
+  document.getElementById('enemy-stats-panel').classList.remove('visible');
+}
+
+function updateEnemyStatsPanel(){
+  const e=G.targetedEnemy;
+  if(!e){ closeEnemyPanel(); return; }
+  if(e.hp<=0){ closeEnemyPanel(); return; }
+  document.getElementById('esp-icon').textContent=e.icon||'👹';
+  document.getElementById('esp-name').textContent=e.name+(e.isBoss?' 👑':'');
+  const hpPct=Math.max(0,e.hp/e.hpMax*100).toFixed(0);
+  document.getElementById('esp-hp-bar').style.width=hpPct+'%';
+  document.getElementById('esp-hp-bar').style.background=
+    hpPct>60?'linear-gradient(90deg,#2a8030,#50c050)':
+    hpPct>30?'linear-gradient(90deg,#807020,#c0a030)':
+             'linear-gradient(90deg,#8b2020,#c04040)';
+  document.getElementById('esp-hp-val').textContent=`${Math.round(e.hp)}/${e.hpMax}`;
+  const arch=e.archetype||'beast';
+  const typeBadge={humanoid_armored:'ARMORED','humanoid_bare':'UNARMORED',beast:'BEAST',undead:'UNDEAD'}[arch]||'CREATURE';
+  const typeCls={humanoid_armored:'humanoid',humanoid_bare:'humanoid',beast:'beast',undead:'undead'}[arch]||'beast';
+  const bossTag=e.isBoss?`<span class="esp-type-badge esp-type-boss">BOSS</span> `:'';
+  document.getElementById('esp-stats').innerHTML=`
+    <div class="esp-stat" style="grid-column:1/-1;margin-bottom:2px">${bossTag}<span class="esp-type-badge esp-type-${typeCls}">${typeBadge}</span></div>
+    <div class="esp-stat"><span class="esp-stat-k">ATK</span> <span class="esp-stat-v">${e.atk}</span></div>
+    <div class="esp-stat"><span class="esp-stat-k">DEF</span> <span class="esp-stat-v">${e.def}</span></div>
+    <div class="esp-stat"><span class="esp-stat-k">SPD</span> <span class="esp-stat-v">${e.speed.toFixed(1)}</span></div>
+    <div class="esp-stat"><span class="esp-stat-k">RNG</span> <span class="esp-stat-v">${e.range}</span></div>
+    ${e.weaponType?`<div class="esp-stat" style="grid-column:1/-1"><span class="esp-stat-k">WPN</span> <span class="esp-stat-v">${e.weaponType}</span></div>`:''}
+    ${e.ranged?`<div class="esp-stat" style="grid-column:1/-1"><span class="esp-stat-k" style="color:#c040ff">✦ RANGED</span></div>`:''}
+  `;
+}
+
+let _espDragActive=false,_espDX=0,_espDY=0,_espInitialized=false;
+function initEnemyPanelDrag(){
+  if(_espInitialized) return;
+  _espInitialized=true;
+  const header=document.getElementById('esp-header');
+  const panel=document.getElementById('enemy-stats-panel');
+  function startDrag(cx,cy){
+    _espDragActive=true;
+    const r=panel.getBoundingClientRect();
+    _espDX=cx-r.left; _espDY=cy-r.top;
+    panel.style.position='fixed'; panel.style.right='auto'; panel.style.bottom='auto';
+    header.classList.add('dragging');
+  }
+  function moveDrag(cx,cy){
+    if(!_espDragActive) return;
+    const nx=Math.max(0,Math.min(window.innerWidth-180,cx-_espDX));
+    const ny=Math.max(0,Math.min(window.innerHeight-120,cy-_espDY));
+    panel.style.left=nx+'px'; panel.style.top=ny+'px';
+  }
+  function endDrag(){ _espDragActive=false; header.classList.remove('dragging'); }
+  header.addEventListener('mousedown',e=>{e.preventDefault();startDrag(e.clientX,e.clientY);});
+  window.addEventListener('mousemove',e=>{if(_espDragActive)moveDrag(e.clientX,e.clientY);});
+  window.addEventListener('mouseup',endDrag);
+  header.addEventListener('touchstart',e=>{const t=e.touches[0];startDrag(t.clientX,t.clientY);},{passive:true});
+  window.addEventListener('touchmove',e=>{if(_espDragActive){const t=e.touches[0];moveDrag(t.clientX,t.clientY);}},{passive:true});
+  window.addEventListener('touchend',endDrag);
+}
+
+// Canvas tap to select enemy
+function setupEnemyTargeting(){
+  const c=document.getElementById('game-canvas');
+  if(!c) return;
+  c.addEventListener('click',e=>{
+    if(!G.player||G.paused||G.shopOpen) return;
+    const rect=c.getBoundingClientRect();
+    const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+    const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+    const wx=(cx*scaleX - canvas.width/2)/G.zoom + G.cam.x;
+    const wy=(cy*scaleY - canvas.height/2)/G.zoom + G.cam.y;
+    let hit=null, bestD=Infinity;
+    G.enemies.forEach(en=>{
+      if(en.hp<=0) return;
+      const d=Math.sqrt((en.x-wx)**2+(en.y-wy)**2);
+      if(d<=en.size+12&&d<bestD){ bestD=d; hit=en; }
+    });
+    if(hit){ openEnemyPanel(hit); }
+    else if(G.targetedEnemy&&bestD>60){ /* keep panel if no new target */ }
+  });
+  c.addEventListener('touchend',e=>{
+    if(!G.player||G.paused||G.shopOpen) return;
+    const rect=c.getBoundingClientRect();
+    const t=e.changedTouches[0];
+    const cx=t.clientX-rect.left, cy=t.clientY-rect.top;
+    const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+    const wx=(cx*scaleX - canvas.width/2)/G.zoom + G.cam.x;
+    const wy=(cy*scaleY - canvas.height/2)/G.zoom + G.cam.y;
+    let hit=null, bestD=Infinity;
+    G.enemies.forEach(en=>{
+      if(en.hp<=0) return;
+      const d=Math.sqrt((en.x-wx)**2+(en.y-wy)**2);
+      if(d<=en.size+16&&d<bestD){ bestD=d; hit=en; }
+    });
+    if(hit) openEnemyPanel(hit);
+  },{passive:true});
 }
 
 // ======================================================
@@ -4640,20 +5650,118 @@ function renderZonePanel(){
 }
 
 // ── Shop ────────────────────────────────────────────────────────
+// ======================================================
+// SHOP INVENTORY GENERATION
+// generateShopInventory(level, mode) — builds the list of items a vendor sells.
+//   level = player level (items are scaled to this)
+//   mode  = which vendor type, determines which item slots and weapon types appear:
+//     'blades'     → swords, axes, hammers
+//     'daggers'    → daggers only
+//     'polearms'   → spears, spear_1h
+//     'scythes'    → scythes only
+//     'bows'       → shortbow, longbow
+//     'staves'     → wands, staffs, focus offhands
+//     'shields_mh' → war shield (main hand weapon)
+//     'shields_oh' → offhand shields only
+//     'offhand'    → mix of focus, dagger, shield offhands
+//     'heavy_armor'→ plate armor pieces
+//     'light_armor'→ leather armor pieces
+//     'accessories'→ rings and amulets
+//     'general'    → a bit of everything
+// countPer = how many of each slot type to generate
+// ======================================================
 function generateShopInventory(level, mode){
   const allSlots=['weapon','offhand','chest','legs','helm','gloves','boots','ring1','amulet'];
-  const weaponSlots=['weapon','weapon','weapon','weapon','offhand']; // weapon-focused
-  const slots = mode==='weapons' ? weaponSlots : mode==='all' ? [...allSlots,...allSlots.slice(0,4)] : allSlots;
-  const countPer = mode==='weapons'?3 : mode==='all'?3:2;
+  let slots, countPer=3;
+
+  if(mode==='blades'){       slots=['weapon','weapon','weapon','weapon']; countPer=4;
+  } else if(mode==='daggers'){   slots=['weapon','weapon','weapon'];          countPer=4;
+  } else if(mode==='polearms'){  slots=['weapon','weapon','weapon'];          countPer=4;
+  } else if(mode==='scythes'){   slots=['weapon','weapon','weapon'];          countPer=4;
+  } else if(mode==='bows'){      slots=['weapon','weapon'];                   countPer=4;
+  } else if(mode==='staves'){    slots=['weapon','weapon','weapon','offhand'];countPer=3;
+  } else if(mode==='shields_mh'){slots=['weapon','weapon','weapon'];          countPer=4;
+  } else if(mode==='shields_oh'){slots=['offhand','offhand','offhand'];       countPer=4;
+  } else if(mode==='shields'){   slots=['offhand','offhand','offhand','weapon'];countPer=3;
+  } else if(mode==='offhand'){   slots=['offhand','offhand','offhand'];       countPer=4;
+  } else if(mode==='heavy_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=3;
+  } else if(mode==='light_armor'){slots=['chest','legs','helm','gloves','boots'];countPer=3;
+  } else if(mode==='accessories'){slots=['ring1','ring2','amulet'];           countPer=4;
+  } else if(mode==='all'){       slots=[...allSlots,...allSlots.slice(0,4)]; countPer=3;
+  } else {                       slots=allSlots;                             countPer=2;
+  }
+
   const uniqueSlots=[...new Set(slots)];
   const items=[];
   uniqueSlots.forEach(slot=>{
     for(let i=0;i<countPer;i++){
       const lv=Math.max(1,level+rand(-1,3));
       const item=genItem(slot,lv);
+      // Force weapon types to match vendor specialty
+      if(slot==='weapon'){
+        if(mode==='blades'){
+          item.weaponType=['sword','axe','hammer','sword'][rand(0,3)];
+          item.name=getWeaponName(item.weaponType,item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='daggers'){
+          item.weaponType='dagger';
+          item.name=getWeaponName('dagger',item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='polearms'){
+          item.weaponType=['spear','spear_1h'][rand(0,1)];
+          item.name=getWeaponName(item.weaponType,item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='scythes'){
+          item.weaponType='scythe';
+          item.name=getWeaponName('scythe',item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='bows'){
+          item.weaponType=['shortbow','longbow'][rand(0,1)];
+          item.name=getWeaponName(item.weaponType,item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='staves'){
+          item.weaponType=['wand','staff'][rand(0,1)];
+          item.name=getWeaponName(item.weaponType,item.rarity);
+          item._iconType='weapon';
+        } else if(mode==='shields_mh'||mode==='shields'){
+          item.weaponType='shield_mh';
+          item.name=getWeaponName('shield_mh',item.rarity);
+          item._iconType='weapon';
+          item.stats={armor:Math.round((3+lv*1.5)*RARITY_MULT[item.rarity]),CON:Math.round((1+lv*0.3)*RARITY_MULT[item.rarity])};
+        }
+      }
+      if(slot==='offhand'){
+        if(mode==='shields_oh'||mode==='shields'){
+          item.offhandType='shield';
+          item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Shield';
+          item.icon='🛡️';
+          item.stats={armor:Math.round((4+lv*2)*RARITY_MULT[item.rarity]),blockChance:parseFloat((0.1+lv*0.01).toFixed(2))};
+          if(Math.random()<0.4) item.stats.CON=Math.round((1+lv*0.3)*RARITY_MULT[item.rarity]);
+          if(Math.random()<0.3) item.stats.hp=Math.round((6+lv*2.5)*RARITY_MULT[item.rarity]);
+        } else if(mode==='offhand'){
+          const roll=Math.random();
+          if(roll<0.45){
+            item.offhandType='dagger'; item.weaponType='offhand_dagger';
+            item.name=getWeaponName('offhand_dagger',item.rarity);
+            item._iconType='weapon';
+          } else if(roll<0.8){
+            item.offhandType='focus';
+            item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Focus';
+            item.icon='🔮';
+          } else {
+            item.offhandType='shield';
+            item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Shield';
+            item.icon='🛡️';
+          }
+        } else if(mode==='staves'){
+          item.offhandType='focus';
+          item.name=(item.rarity!=='Common'?item.rarity+' ':'')+'Focus';
+          item.icon='🔮';
+          item.stats={INT:Math.round((2+lv*0.5)*RARITY_MULT[item.rarity]),WIS:Math.round((1+lv*0.3)*RARITY_MULT[item.rarity])};
+        }
+      }
       const bump=['Common','Uncommon','Rare'];
       if(Math.random()<0.4) item.rarity=bump[Math.min(2,bump.indexOf(item.rarity)+1)];
-      // All emporium gets better items
       if(mode==='all'&&Math.random()<0.3) item.rarity=['Rare','Epic'][rand(0,1)];
       item.shopPrice=Math.round(itemSellValue(item)*2.5);
       items.push(item);
@@ -4665,6 +5773,94 @@ function generateShopInventory(level, mode){
 function refreshShopInventory(mode){
   const m=mode||(G.currentShopNPC&&G.currentShopNPC.mode)||'general';
   G.shopInventory=generateShopInventory(G.player?G.player.level:1, m);
+}
+
+// ======================================================
+// SHARED STASH (Chest in town — shared across ALL characters)
+// Items stored here persist between sessions using the browser's localStorage.
+// ALL characters on the same browser share the same stash.
+// Max stash size = 80 items. Max inventory = 40 items.
+// To clear the stash entirely (in browser console): localStorage.removeItem('aether_shared_stash')
+// ======================================================
+function getSharedStash(){
+  try{ return JSON.parse(localStorage.getItem('aether_shared_stash')||'[]'); }
+  catch(e){ return []; }
+}
+function setSharedStash(items){ localStorage.setItem('aether_shared_stash',JSON.stringify(items)); }
+
+function openChest(){
+  G.paused=true;
+  renderChestPanel();
+  document.getElementById('chest-overlay').classList.add('open');
+}
+function closeChest(){
+  document.getElementById('chest-overlay').classList.remove('open');
+  G.paused=false;
+}
+
+function renderChestPanel(){
+  const p=G.player;
+  const stash=getSharedStash();
+  const body=document.getElementById('chest-body');
+  let html=`<div style="font-size:0.78rem;color:var(--text2);margin-bottom:10px">
+    Items here are shared across all characters. Tap to move between inventory &amp; stash.
+  </div>`;
+
+  html+=`<div class="stat-section-title">STASH (${stash.length}/80)</div>`;
+  if(stash.length===0){
+    html+=`<div style="color:var(--text2);font-size:0.8rem;padding:12px 0;text-align:center">Empty</div>`;
+  } else {
+    html+=`<div class="inv-grid">`;
+    stash.forEach((item,i)=>{
+      const rc=RARITY_GLOW[item.rarity]||'#888';
+      html+=`<div class="inv-cell" style="border-color:${rc}40" onclick="withdrawFromStash(${i})" title="${item.name}">
+        <div class="inv-cell-icon">${itemIconHTML(item,28)}</div>
+        <div class="inv-cell-name rarity-${item.rarity.toLowerCase()}">${item.name}</div>
+        <div class="inv-cell-sell" style="color:#6090d0">↑ TAKE</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  html+=`<div class="stat-section-title" style="margin-top:14px">YOUR INVENTORY (${p.inventory.length}/40)</div>`;
+  if(p.inventory.length===0){
+    html+=`<div style="color:var(--text2);font-size:0.8rem;padding:12px 0;text-align:center">Empty</div>`;
+  } else {
+    html+=`<div class="inv-grid">`;
+    p.inventory.forEach((item,i)=>{
+      const rc=RARITY_GLOW[item.rarity]||'#888';
+      html+=`<div class="inv-cell" style="border-color:${rc}40" onclick="depositToStash(${i})" title="${item.name}">
+        <div class="inv-cell-icon">${itemIconHTML(item,28)}</div>
+        <div class="inv-cell-name rarity-${item.rarity.toLowerCase()}">${item.name}</div>
+        <div class="inv-cell-sell" style="color:#c09020">↓ STASH</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  body.innerHTML=html;
+}
+
+function depositToStash(invIdx){
+  const p=G.player;
+  const stash=getSharedStash();
+  if(stash.length>=80){ showToast('Stash full! (80 items)'); return; }
+  const item=p.inventory.splice(invIdx,1)[0];
+  stash.push(item);
+  setSharedStash(stash);
+  renderChestPanel();
+  showToast('Deposited: '+item.name);
+}
+
+function withdrawFromStash(stashIdx){
+  const p=G.player;
+  const stash=getSharedStash();
+  if(p.inventory.length>=40){ showToast('Inventory full!'); return; }
+  const item=stash.splice(stashIdx,1)[0];
+  setSharedStash(stash);
+  p.inventory.push(item);
+  renderChestPanel();
+  showToast('Withdrew: '+item.name);
 }
 
 function openShop(npc){
@@ -4851,7 +6047,7 @@ function rerollShop(){
 
 function selectZone(idx){
   G.zone=idx;
-  G.enemies=[]; G.projectiles=[]; G.particles=[]; G.slashEffects=[]; G.groundItems=[];
+  G.enemies=[]; G.corpses=[]; G.projectiles=[]; G.particles=[]; G.slashEffects=[]; G.groundItems=[];
   G.shopOpen=false;
   G.portalCooldown=2.0; // prevent re-entering portal immediately
   // Place player at center of new zone
@@ -4876,14 +6072,19 @@ function renderCharPanel(){
   const attrDesc={STR:'Melee dmg',DEX:'Crit/ranged',CON:'HP',INT:'Skill dmg',WIS:'Energy/heal',SPD:'Move speed',LCK:'Drop rate/rarity'};
 
   const pts=p.attrPoints||0;
+  const MAX_LEVEL=20;
+  const isMax=p.level>=MAX_LEVEL;
+  const tokens=p.prestigeTokens||0;
 
   let html=`<div style="text-align:center;padding:12px 0 16px">
     <div style="font-size:2.5rem;margin-bottom:6px">${cls.icon}</div>
     <div style="font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);letter-spacing:0.1em">${cls.name}</div>
-    <div style="font-size:0.85rem;color:var(--text2);margin-top:2px">Level ${p.level} &nbsp;·&nbsp; ${p.xp}/${p.xpNext} XP</div>
+    <div style="font-size:0.85rem;color:var(--text2);margin-top:2px">${isMax?`<span style="color:var(--legendary)">Level ${p.level} ⚔️ MAX</span>`:
+      `Level ${p.level} &nbsp;·&nbsp; ${p.xp}/${p.xpNext} XP`}</div>
     <div style="width:120px;height:4px;background:#1a1a2a;margin:8px auto 0;border:1px solid #333">
-      <div style="height:100%;background:var(--legendary);width:${(p.xp/p.xpNext*100).toFixed(1)}%"></div>
+      <div style="height:100%;background:var(--legendary);width:${isMax?100:(p.xp/p.xpNext*100).toFixed(1)}%"></div>
     </div>
+    ${tokens>0?`<div style="margin-top:10px;font-family:'Cinzel',serif;font-size:0.85rem;color:var(--legendary)">⚔️ Prestige Tokens: ${tokens} — Trade at Legendary Vendor</div>`:''}
   </div>`;
 
   html+=`<div class="stat-section-title">COMBAT</div><div class="stat-grid">
@@ -5286,57 +6487,120 @@ function hideItemTooltip(){
 // ======================================================
 // SKILLS PANEL
 // ======================================================
+function skillTypeBadge(sk){
+  if(!sk) return '';
+  const isHeal = sk.type==='heal'||sk.type==='heal_dot'||sk.id==='heal'||sk.id==='rejuvenate'||sk.id==='second_wind';
+  const isBuff = sk.type==='buff'||sk.category==='Buff'||sk.category==='Defense'||sk.category==='Passive';
+  const isAoe  = sk.aoe||sk.type==='aoe_self';
+  if(isHeal) return `<span style="background:rgba(50,160,80,0.25);border:1px solid #40a060;color:#60e090;font-size:0.6rem;font-family:'Cinzel',serif;padding:1px 5px;letter-spacing:0.05em;border-radius:2px">♥ HEAL</span>`;
+  if(isBuff)  return `<span style="background:rgba(60,100,200,0.25);border:1px solid #4060c0;color:#80a0ff;font-size:0.6rem;font-family:'Cinzel',serif;padding:1px 5px;letter-spacing:0.05em;border-radius:2px">✦ BUFF</span>`;
+  if(isAoe)   return `<span style="background:rgba(200,100,20,0.25);border:1px solid #c06020;color:#ffaa40;font-size:0.6rem;font-family:'Cinzel',serif;padding:1px 5px;letter-spacing:0.05em;border-radius:2px">⭕ AOE</span>`;
+  return `<span style="background:rgba(180,40,40,0.2);border:1px solid #a04040;color:#e06060;font-size:0.6rem;font-family:'Cinzel',serif;padding:1px 5px;letter-spacing:0.05em;border-radius:2px">⚔ SINGLE</span>`;
+}
+
+// ======================================================
+// SKILLS PANEL — the panel that opens when you tap the skills button
+//
+// HOW SKILLS WORK:
+//   - You have 8 hotbar slots (shown at the bottom of the screen)
+//   - Skills must first be OWNED (learned/bought) before you can equip them
+//   - Tap any owned skill here to equip it into the next free slot
+//   - Tap an equipped skill to unequip it (frees the slot)
+//   - The big red "CLEAR ALL EQUIPPED SLOTS" button at the top
+//     empties ALL 8 slots at once — you keep ownership of all skills
+//
+// SKILL TYPE BADGES:
+//   ⚔ SINGLE — hits one enemy at a time
+//   ⭕ AOE    — hits all enemies in a radius
+//   ✦ BUFF   — boosts your stats for a duration
+//   ♥ HEAL   — restores your HP
+// ======================================================
 function renderSkillsPanel(){
   const p=G.player;
   const body=document.getElementById('skills-body');
 
-  let html=`<div style="font-size:0.8rem;color:var(--text2);margin-bottom:10px;line-height:1.5">
-    Tap a skill to equip/unequip. Up to 8 active slots.
-  </div><div class="skills-list">`;
+  // ── CLEAR ALL SLOTS button — big and obvious at the top ─────────────
+  // This empties all 8 skill hotbar slots so you can re-assign freely.
+  // Skills you own are NOT lost — just unequipped.
+  let html=`
+  <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border)">
+    <button onclick="clearAllSkills()"
+      style="width:100%;font-family:'Cinzel',serif;font-size:0.85rem;
+             padding:10px 0;letter-spacing:0.12em;cursor:pointer;
+             background:rgba(180,40,40,0.18);border:2px solid #c04040;
+             color:#ff8080;display:flex;align-items:center;justify-content:center;gap:8px">
+      🗑 CLEAR ALL EQUIPPED SLOTS
+    </button>
+    <div style="font-size:0.68rem;color:var(--text2);text-align:center;margin-top:5px">
+      Removes all skills from the hotbar — you keep ownership of every skill you bought.
+    </div>
+  </div>
+  <div class="skills-list">`;
 
-  // Show all class skills, locked ones greyed out
+  // ── List every skill the class can learn ─────────────────────────────
+  // Learned skills = clickable to equip/unequip.
+  // Unlearned skills = shown greyed-out with a lock icon (can be bought from vendors).
   const allClassSkills=Object.values(ALL_SKILLS);
   const displaySkills=[...new Set([...p.learnedSkills,...allClassSkills.filter(s=>s.id).map(s=>s.id)])];
+
   displaySkills.forEach(skId=>{
     const sk=ALL_SKILLS[skId];
     if(!sk) return;
     const isLearned=p.learnedSkills.includes(skId);
     const isEquipped=p.equippedSkills.includes(skId);
     const slotIdx=p.equippedSkills.indexOf(skId);
+    const badge=skillTypeBadge(sk); // returns colored tag: ⚔ SINGLE / ⭕ AOE / ✦ BUFF / ♥ HEAL
+
     if(!isLearned){
-      // Show locked
-      html+=`<div class="skill-row" style="opacity:0.3;cursor:not-allowed">
+      // Locked skill — show dimmed, no click action
+      html+=`<div class="skill-row" style="opacity:0.32;cursor:not-allowed">
         <div class="skill-icon-big" style="filter:grayscale(1)">${sk.icon}</div>
         <div class="skill-info">
-          <div class="skill-row-name" style="color:var(--text2)">${sk.name} 🔒</div>
+          <div class="skill-row-name" style="color:var(--text2)">${sk.name} 🔒 &nbsp;${badge}</div>
           <div class="skill-row-desc">${sk.desc}</div>
           <div class="skill-row-cost">⚡${sk.cost} · CD ${sk.cooldown}s · ${sk.category}</div>
         </div>
       </div>`;
       return;
     }
+
+    // Owned skill — tap to equip (goes into first free slot) or unequip
     html+=`<div class="skill-row ${isEquipped?'equipped':''}" onclick="toggleEquipSkill('${skId}')">
       <div class="skill-icon-big">${sk.icon}</div>
       <div class="skill-info">
-        <div class="skill-row-name">${sk.name}</div>
+        <div class="skill-row-name">${sk.name} &nbsp;${badge}</div>
         <div class="skill-row-desc">${sk.desc}</div>
         <div class="skill-row-cost">⚡${sk.cost} &nbsp;·&nbsp; CD ${sk.cooldown}s &nbsp;·&nbsp; ${sk.category}</div>
       </div>
-      ${isEquipped?`<div class="skill-slot-badge">SLOT ${slotIdx+1}</div>`:''}
+      ${isEquipped
+        ? `<div class="skill-slot-badge">SLOT ${slotIdx+1}</div>`
+        : `<div style="font-size:0.68rem;color:var(--text2);flex-shrink:0;padding:0 4px">TAP<br>EQUIP</div>`}
     </div>`;
   });
+
   html+='</div>';
   body.innerHTML=html;
 }
 
+// ──────────────────────────────────────────────────────
+// clearAllSkills — empties all 8 hotbar slots
+// Called by the big red button in the skills panel.
+// Does NOT remove ownership of skills — you keep everything you bought.
+// ──────────────────────────────────────────────────────
 function clearAllSkills(){
   const p=G.player;
-  p.equippedSkills=new Array(8).fill(null);
-  refreshSkillBar();
-  renderSkillsPanel();
+  p.equippedSkills=new Array(8).fill(null); // fill all 8 slots with null (empty)
+  refreshSkillBar();      // update the visual hotbar at the bottom of the screen
+  renderSkillsPanel();    // re-render the skills list panel
   showToast('All skill slots cleared');
 }
 
+// ──────────────────────────────────────────────────────
+// toggleEquipSkill — equip or unequip a skill from the hotbar
+// If the skill is already equipped, it gets removed from that slot.
+// If not equipped and there's a free slot, it gets added there.
+// If all 8 slots are full, shows a "Full!" toast message.
+// ──────────────────────────────────────────────────────
 function toggleEquipSkill(skId){
   const p=G.player;
   const idx=p.equippedSkills.indexOf(skId);
@@ -5462,7 +6726,7 @@ function doLoadSave(saveId){
     G.zone=save.zone||0;
     G.currentSaveId=saveId;
     G.cam={x:G.player.x,y:G.player.y};
-    G.enemies=[];G.projectiles=[];G.particles=[];G.slashEffects=[];G.groundItems=[];
+    G.enemies=[];G.corpses=[];G.projectiles=[];G.particles=[];G.slashEffects=[];G.groundItems=[];
     G.autoAttack=true;G.paused=false;
     G.spawnTimer=0;G.spawnInterval=1.5;G.maxEnemies=20;
     G.energyRegen=2;G.worldSize=2400;G.allies=[];
@@ -5661,7 +6925,7 @@ function loadCharacter(pid,cid){
   G.activeProfileId=pid;G.currentCharId=cid;
   G.player=data.player;G.zone=data.zone||0;
   G.cam={x:G.player.x,y:G.player.y};
-  G.enemies=[];G.projectiles=[];G.particles=[];G.slashEffects=[];G.groundItems=[];
+  G.enemies=[];G.corpses=[];G.projectiles=[];G.particles=[];G.slashEffects=[];G.groundItems=[];
   G.autoAttack=true;G.paused=false;G.shopOpen=false;
   G.spawnTimer=0;G.spawnInterval=1.5;G.maxEnemies=20;
   G.energyRegen=2;G.worldSize=2400;G.allies=[];
@@ -6343,6 +7607,11 @@ window.addEventListener('resize', () => { resizeCanvas(); if(G.player) render();
 // ======================================================
 // BOOT
 // ======================================================
+// ======================================================
+// BOOT — called once when the page loads
+// Sets up the canvas, input handlers, and shows the main menu.
+// This is the entry point of the entire game.
+// ======================================================
 function boot(){
   initClassSelect();
   setTimeout(initMinimapDrag,200);
@@ -6358,81 +7627,4 @@ if("serviceWorker" in navigator){
     .catch(e=>console.error("SW error",e));
 }
 </script>
-</html>function renderSkillsPanel(){
-  const p=G.player;
-  const body=document.getElementById('skills-body');
-  const pool=CLASS_SKILL_POOLS[p.cls]||[];
-  // Tabs: EQUIPPED | ALL SKILLS
-  const activeTab=body.dataset.tab||'all';
-  let html=`<div style="display:flex;gap:6px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px;align-items:center">
-    <button class="dtab ${activeTab==='equipped'?'active':''}" onclick="setSkillTab('equipped')">EQUIPPED</button>
-    <button class="dtab ${activeTab==='all'?'active':''}" onclick="setSkillTab('all')">ALL SKILLS</button>
-    <span style="margin-left:auto;font-size:0.75rem;color:var(--gold);line-height:2">⚜${p.gold}</span>
-    <button onclick="clearAllSkills()" style="font-family:'Cinzel',serif;font-size:0.6rem;padding:3px 8px;background:rgba(192,64,64,0.15);border:1px solid #c04040;color:#e08080;cursor:pointer;letter-spacing:0.05em" title="Clear all equipped slots">CLEAR</button>
-  </div><div class="skills-list">`;
-
-  const display = activeTab==='equipped'
-    ? p.equippedSkills.filter(Boolean)
-    : pool;
-
-  display.forEach(skId=>{
-    const sk=ALL_SKILLS[skId];
-    if(!sk) return;
-    const isLearned=p.learnedSkills.includes(skId);
-    const isEquipped=p.equippedSkills.includes(skId);
-    const slotIdx=p.equippedSkills.indexOf(skId);
-    const cost=skillCost(skId);
-    const isFree=cost===0;
-    const canAfford=p.gold>=cost;
-
-    if(!isLearned){
-      html+=`<div class="skill-row" style="${canAfford?'':'opacity:0.5'};border-color:rgba(201,168,76,0.2)" onclick="buySkill('${skId}')">
-        <div class="skill-icon-big">${sk.icon}</div>
-        <div class="skill-info">
-          <div class="skill-row-name">${sk.name}</div>
-          <div class="skill-row-desc">${sk.desc}</div>
-          <div class="skill-row-cost">⚡${sk.cost} · CD ${sk.cooldown}s · ${sk.category}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
-          <div class="shop-price ${canAfford?'can-afford':'cant-afford'}">⚜${cost}</div>
-          <div style="font-size:0.6rem;color:var(--text2)">BUY</div>
-        </div>
-      </div>`;
-      return;
-    }
-    html+=`<div class="skill-row ${isEquipped?'equipped':''}" onclick="toggleEquipSkill('${skId}')">
-      <div class="skill-icon-big">${sk.icon}</div>
-      <div class="skill-info">
-        <div class="skill-row-name">${sk.name}</div>
-        <div class="skill-row-desc">${sk.desc}</div>
-        <div class="skill-row-cost">⚡${sk.cost} · CD ${sk.cooldown}s · ${sk.category}</div>
-      </div>
-      ${isEquipped?`<div class="skill-slot-badge">SLOT ${slotIdx+1}</div>`:'<div style="font-size:0.7rem;color:var(--text2);flex-shrink:0">TAP EQUIP</div>'}
-    </div>`;
-  });
-  html+='</div>';
-  body.innerHTML=html;
-  body.dataset.tab=activeTab;
-}
-
-function setSkillTab(tab){
-  const body=document.getElementById('skills-body');
-  if(body) body.dataset.tab=tab;
-  renderSkillsPanel();
-}
-
-function buySkill(skId){
-  const p=G.player;
-  const cost=skillCost(skId);
-  const sk=ALL_SKILLS[skId];
-  if(!sk) return;
-  if(p.gold<cost){ showToast('Need ⚜'+cost+' gold'); return; }
-  if(p.learnedSkills.includes(skId)){ showToast('Already learned'); return; }
-  p.gold-=cost;
-  p.learnedSkills.push(skId);
-  showToast('Learned: '+sk.name+(cost===0?' (free)':''));
-  updateHUD();
-  renderSkillsPanel();
-}
-
-
+</html>
