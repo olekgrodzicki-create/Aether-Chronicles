@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
@@ -7972,6 +7972,19 @@ document.addEventListener('fullscreenchange',       onFullscreenChange);
 document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 document.addEventListener('mozfullscreenchange',    onFullscreenChange);
 window.addEventListener('resize', () => { resizeCanvas(); if(G.player) render(); });
+
+// Auto-fullscreen: request on first tap/click (browsers require a user gesture)
+let _fsRequested = false;
+function _autoFullscreen(){
+  if(_fsRequested || isFullscreen()) return;
+  _fsRequested = true;
+  // Try fullscreen on the root element so the entire page fills the screen
+  const el = document.documentElement;
+  const go = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+  if(go){ const p = go.call(el); if(p && p.catch) p.catch(()=>{}); }
+}
+document.addEventListener('touchstart', _autoFullscreen, {once:true, passive:true});
+document.addEventListener('click',      _autoFullscreen, {once:true});
 
 // ======================================================
 // BOOT
