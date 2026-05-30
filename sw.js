@@ -1,6 +1,6 @@
-const CACHE_NAME = 'aether-chronicles-v1';
+const CACHE_NAME = 'aether-chronicles-v2';
 const ASSETS = [
-  'game201.html',
+  'index.html',
   'manifest.json',
   'icons/icon-192.png',
   'icons/icon-512.png',
