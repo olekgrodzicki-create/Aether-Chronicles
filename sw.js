@@ -1,9 +1,9 @@
 const CACHE_NAME = 'aether-chronicles-v1';
 const ASSETS = [
-  '/Aether-Chronicles/game201.html',
-  '/Aether-Chronicles/manifest.json',
-  '/Aether-Chronicles/icons/icon-192.png',
-  '/Aether-Chronicles/icons/icon-512.png',
+  'game201.html',
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
 ];
 
 self.addEventListener('install', e => {
